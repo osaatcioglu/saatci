@@ -27,7 +27,7 @@ The publishing surface for the letter series: Kadikoy'den Mektuplar (Turkish) an
 
 1. Verify the page in headless Chrome (CDP screenshot + zero JS errors) before committing.
 2. Commit with a plain descriptive message. Never amend; always new commits.
-3. Push to main; GitHub Pages serves from the root.
+3. Push to main immediately, every time. GitHub Pages serves from the root; the live URL (https://osaatcioglu.github.io/saatci/) is the single reading surface. Never leave an edit unpushed, and never point Omer at a local file; after pushing, verify the live URL serves the change (curl with a cache-buster) and remind him to hard refresh if his tab is stale.
 
 ## Model policy
 
