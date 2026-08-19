@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Pencil Was the Miracle</title>
+<style>
+:root{
+  --ink:#f7f2e4; --ink2:#efe7d3; --plate:#f2ecdc;
+  --brass:#8c6a22; --brass-hi:#674e12; --brass-dim:rgba(140,106,34,.28);
+  --verdi:#2a745c; --sky:#35648c; --madder:#ad4732;
+  --text:#211d12; --text-dim:#655d4a;
+  --hairline:rgba(140,106,34,.22);
+  --serif:"Didot","Bodoni 72","Baskerville","Hoefler Text",Georgia,serif;
+  --mono:"SF Mono","Menlo","Courier New",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink); color:var(--text);
+  font-family:var(--serif); overflow-x:hidden;
+}
+body::after{ /* grain */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:99; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+::selection{background:var(--brass);color:var(--ink)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--brass-dim);border-radius:5px}
+
+section{
+  min-height:100vh; position:relative; padding:8vh 7vw;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  border-top:1px solid var(--hairline);
+}
+.plate{max-width:1060px;width:100%}
+.movnum{
+  font-family:var(--mono); font-size:.85rem; letter-spacing:.45em; color:var(--brass);
+  text-transform:uppercase; margin-bottom:1.1rem; opacity:0; transform:translateY(14px);
+  transition:all .8s ease .1s;
+}
+h2{
+  font-size:clamp(1.9rem,4.2vw,3.1rem); font-weight:400; letter-spacing:.01em;
+  margin-bottom:.7rem; opacity:0; transform:translateY(14px); transition:all .8s ease .22s;
+}
+.lede{
+  color:var(--text-dim); font-size:clamp(1.15rem,1.8vw,1.4rem); line-height:1.7;
+  max-width:640px; margin-bottom:2.6rem; opacity:0; transform:translateY(14px);
+  transition:all .8s ease .34s;
+}
+section.vis .movnum, section.vis h2, section.vis .lede{opacity:1;transform:none}
+.stage{
+  opacity:0; transition:opacity 1s ease .5s;
+}
+section.vis .stage{opacity:1}
+em{color:var(--brass-hi);font-style:normal}
+.num{font-family:var(--mono)}
+
+/* nav dots */
+#nav{position:fixed;right:1.4rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.65rem}
+#nav a{width:7px;height:7px;border-radius:50%;background:var(--brass-dim);display:block;transition:all .3s}
+#nav a.on{background:var(--brass);box-shadow:0 0 8px var(--brass)}
+
+/* controls */
+.ctl{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:1.6rem}
+button{
+  font-family:var(--mono);font-size:.92rem;letter-spacing:.12em;color:var(--brass);
+  background:transparent;border:1px solid var(--brass-dim);padding:.55em 1.2em;cursor:pointer;
+  border-radius:2px;transition:all .25s;text-transform:uppercase;
+}
+button:hover{border-color:var(--brass);background:rgba(140,106,34,.08)}
+button.hot{background:var(--brass);color:var(--ink);border-color:var(--brass)}
+button:disabled{opacity:.35;cursor:default}
+input[type=range]{
+  -webkit-appearance:none;width:200px;height:2px;background:var(--brass-dim);outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);
+  cursor:pointer;box-shadow:0 0 8px rgba(140,106,34,.6);
+}
+.readout{font-family:var(--mono);font-size:1.02rem;color:var(--text-dim)}
+.readout b{color:var(--brass-hi);font-weight:400}
+
+/* I leftovers */
+#baskets{display:flex;gap:6px;align-items:flex-end;justify-content:center;height:230px;margin-top:1rem}
+.basket{width:26px;background:linear-gradient(180deg,rgba(140,106,34,.55),rgba(140,106,34,.18));
+  border:1px solid var(--brass-dim);border-bottom-width:3px;transition:height .5s cubic-bezier(.5,1.6,.4,1);position:relative}
+.basket span{position:absolute;bottom:-1.6rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.6rem;color:var(--text-dim)}
+#crumbs{display:flex;gap:9px;justify-content:center;margin-top:3rem;min-height:26px;flex-wrap:wrap}
+.crumb{width:13px;height:13px;border-radius:50%;background:var(--madder);
+  box-shadow:0 0 10px rgba(173,71,50,.8);animation:crumb .5s cubic-bezier(.5,1.8,.4,1) backwards}
+@keyframes crumb{from{transform:scale(0) translateY(-30px)}}
+#eq1{text-align:center;font-size:1.55rem;margin-top:1.4rem;font-family:var(--mono)}
+#eq1 .r{color:var(--madder)}
+#eq1 .clean{color:var(--verdi)}
+
+/* II clock */
+.clockwrap{display:flex;gap:4vw;align-items:center;justify-content:center;flex-wrap:wrap}
+#trail{font-family:var(--mono);font-size:1.08rem;line-height:2.2;color:var(--text-dim);min-width:210px;max-width:260px}
+#trail em{font-size:1.05rem}
+
+/* IV atoms */
+#bubbles{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;min-height:130px;margin-top:1rem}
+.bub{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+  border:1px solid var(--brass);color:var(--brass-hi);background:radial-gradient(circle at 35% 30%,rgba(140,106,34,.28),rgba(140,106,34,.05));
+  animation:pop .5s cubic-bezier(.5,1.8,.4,1) backwards}
+@keyframes pop{from{transform:scale(0)}}
+.bub.prime-solo{border-color:var(--brass-hi);box-shadow:0 0 26px rgba(103,78,18,.35)}
+.chips{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:1.2rem}
+.atomin{font-family:var(--mono);background:transparent;border:1px solid var(--brass-dim);color:var(--text);
+  padding:.5em .8em;width:150px;font-size:1.1rem;border-radius:2px;text-align:center}
+
+/* V neighbours */
+#nbr{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;margin-top:1rem}
+.card{border:1px solid var(--hairline);padding:1.4rem 1.6rem;min-width:215px;text-align:center;background:rgba(255,252,243,.75);transition:all .4s}
+.card.mid{border-color:var(--brass);box-shadow:0 0 34px rgba(140,106,34,.12)}
+.card h3{font-family:var(--mono);font-weight:400;font-size:1.95rem;margin-bottom:.7rem}
+.card .fac{font-family:var(--mono);font-size:1.08rem;color:var(--sky);min-height:2.4em}
+.card .badge{display:inline-block;margin-top:.8rem;font-family:var(--mono);font-size:.8rem;letter-spacing:.15em;
+  padding:.35em .8em;border:1px solid var(--hairline);border-radius:2px;color:var(--text-dim)}
+.card .badge.yes{color:var(--verdi);border-color:var(--verdi)}
+.card .badge.no{color:var(--madder);border-color:rgba(173,71,50,.5)}
+
+/* VI mirror */
+#mirror{width:100%;max-width:900px;margin:0 auto}
+.mline{display:flex;gap:2rem;justify-content:center;margin-top:1rem;font-family:var(--mono);font-size:1.05rem;flex-wrap:wrap}
+.mline b{font-weight:400}
+.mA{color:var(--brass-hi)} .mB{color:var(--sky)}
+
+/* VII perfect */
+#towerwrap{display:flex;gap:5vw;align-items:flex-end;justify-content:center;height:300px;margin-top:1rem}
+#tower{display:flex;flex-direction:column-reverse;width:120px;border-bottom:2px solid var(--brass)}
+#tower div{border:1px solid rgba(247,242,228,.9);background:linear-gradient(90deg,var(--brass),#75581c);
+  font-family:var(--mono);font-size:.62rem;color:var(--ink);display:flex;align-items:center;justify-content:center;
+  transition:height .6s ease;overflow:hidden;animation:pop .45s backwards}
+#target{width:120px;position:relative;border-bottom:2px solid var(--hairline)}
+#target .fill{position:absolute;bottom:0;width:100%;background:repeating-linear-gradient(45deg,rgba(42,116,92,.25) 0 8px,rgba(42,116,92,.1) 8px 16px);border:1px dashed var(--verdi)}
+#target span,#tower>span{position:absolute;top:-1.7rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.75rem;color:var(--text-dim);white-space:nowrap}
+#verdict{text-align:center;font-family:var(--mono);margin-top:1.3rem;font-size:1.15rem;min-height:1.4em}
+
+/* VIII gears */
+.gearwrap{display:flex;gap:3vw;align-items:center;justify-content:center;flex-wrap:wrap}
+#gmeta{font-family:var(--mono);font-size:1.08rem;line-height:2;color:var(--text-dim);min-width:230px}
+#gmeta em{font-size:1.1rem}
+
+/* IX sliver */
+.slwrap{display:flex;gap:3vw;align-items:center;justify-content:center;flex-wrap:wrap}
+
+/* X finale */
+#finale{padding:6vh 0}
+#finale .plate{max-width:none;width:100%}
+#tl{display:block;width:100%;height:430px;cursor:crosshair}
+#tlctl{padding:0 7vw}
+#tlnote{font-family:var(--mono);text-align:center;color:var(--text-dim);font-size:1.05rem;margin-top:.8rem;min-height:1.3em}
+#tlnote em{color:var(--brass-hi)}
+
+/* the coincidence */
+.pt-heart{--acc:#8c6a22;background:#f6eedb}
+.coin{font-family:var(--mono);max-width:740px;margin:0 auto 1.5rem;font-size:1.05rem;line-height:1.7;
+  color:var(--text-dim);display:flex;gap:1.3rem;align-items:baseline;text-align:left}
+.coin b{font-size:2rem;color:var(--brass-hi);font-weight:400;flex:none;min-width:3.2em;text-align:right}
+
+/* part color codes: the background IS the code */
+.pt-case{--acc:#8c6a22;background:#f4ecd4}
+.pt-engines{--acc:#35648c;background:#e9eff5}
+.pt-move{--acc:#2a745c;background:#e8f1ea}
+.pt-machine{--acc:#7d3f2a;background:#f6e9e0}
+.pt-land{--acc:#7a5a86;background:#f0e9f2}
+.pt-vow{--acc:#ad4732;background:#f8e8e1}
+section[class*="pt-"] .movnum{color:var(--acc)}
+section[class*="pt-"] h2{color:color-mix(in srgb,var(--acc) 55%, var(--text))}
+canvas.sky{width:100%;display:block;border-top:1px solid var(--hairline);
+  border-bottom:1px solid var(--hairline);background:rgba(255,252,243,.5)}
+.cap{font-family:var(--mono);font-size:1rem;color:var(--text-dim);margin-top:.7rem;text-align:center}
+.cap b{color:var(--brass-hi);font-weight:400}
+
+/* reference watches */
+.watchref{display:flex;gap:1.6rem;align-items:center;justify-content:center;margin:0 auto 2.2rem;max-width:760px;flex-wrap:wrap}
+.watchref canvas{width:200px;height:200px;flex:none}
+.wrcap{font-family:var(--mono);font-size:.95rem;line-height:1.6;color:var(--text-dim);max-width:420px;text-align:left}
+.wrcap b{color:var(--brass-hi);font-weight:400}
+
+/* the vow */
+#vow .plate{max-width:780px;text-align:center}
+#vow .vowframe{font-family:var(--mono);font-size:.95rem;letter-spacing:.14em;color:var(--text-dim);
+  text-transform:uppercase;margin-bottom:2.4rem;opacity:0;transition:all .8s ease .1s}
+#vow p{font-size:clamp(1.2rem,1.8vw,1.45rem);line-height:1.9;margin-bottom:1.8rem;color:var(--text);
+  opacity:0;transform:translateY(14px);transition:all .9s ease}
+section.vis#vow p,section.vis#vow .vowframe{opacity:1;transform:none}
+#vow p em{color:var(--brass-hi)}
+.cartouche{display:inline-block;border:1.5px solid var(--brass);border-radius:2em;
+  padding:.05em .65em .1em;position:relative;color:var(--brass-hi);white-space:nowrap}
+.cartouche::after{content:"";position:absolute;right:-7px;top:15%;height:70%;width:2.5px;background:var(--brass)}
+#vow .vowsig{font-family:var(--mono);font-size:.95rem;letter-spacing:.3em;color:var(--brass);
+  text-transform:uppercase;margin-top:2.2rem;opacity:0;transition:all .9s ease 1.2s}
+section.vis#vow .vowsig{opacity:1}
+
+/* the watch */
+#watchcv{width:min(640px,92vw);height:580px;display:block;margin:0 auto;cursor:pointer}
+#watchcap{font-family:var(--mono);font-size:1rem;color:var(--text-dim);text-align:center;margin-top:.4rem;min-height:1.4em}
+
+/* machine strips */
+.mstrip{max-width:880px;margin:-1rem auto 2.4rem;opacity:0;transform:translateY(12px);transition:all .9s ease .4s}
+section.vis .mstrip{opacity:1;transform:none}
+canvas.mini{width:100%;height:170px;display:block;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:rgba(255,252,243,.5)}
+.mscap{font-family:var(--mono);font-size:.98rem;color:var(--text-dim);margin-top:.6rem;text-align:center}
+.mscap b{color:var(--brass-hi);font-weight:400}
+
+/* wheel anchor notes */
+.wheelnote{display:flex;align-items:center;gap:1rem;max-width:640px;margin:-1.4rem 0 2rem;
+  padding:.8rem 1.1rem;border-left:2px solid var(--brass-dim);background:rgba(140,106,34,.06);
+  opacity:0;transform:translateY(12px);transition:all .8s ease .45s}
+section.vis .wheelnote{opacity:1;transform:none}
+.wheelnote span{font-size:1.02rem;line-height:1.6;color:var(--text-dim)}
+.wheelnote b{color:var(--text);font-weight:400}
+
+/* intro */
+#intro .plate{max-width:760px}
+#intro p{font-size:clamp(1.15rem,1.7vw,1.35rem);line-height:1.85;margin-bottom:1.5rem;color:var(--text);
+  opacity:0;transform:translateY(14px);transition:all .8s ease}
+section.vis#intro p{opacity:1;transform:none}
+#intro p em{color:var(--brass-hi)}
+#intro .sig2{font-family:var(--mono);font-size:.9rem;letter-spacing:.25em;color:var(--brass);text-transform:uppercase;
+  margin-top:1rem;opacity:0;transition:all .8s ease 1s}
+section.vis#intro .sig2{opacity:1}
+
+/* touchdown register */
+#reg .plate{max-width:980px}
+.tdrows{position:relative;margin-top:1rem}
+.tdrows::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--hairline)}
+.td{display:grid;grid-template-columns:1fr 40px 1fr;align-items:start;margin-bottom:1.5rem;
+  opacity:0;transform:translateY(16px);transition:all .7s ease;cursor:pointer}
+section.vis .td{opacity:1;transform:none}
+.td .cell{padding:0 .4rem}
+.td .l{text-align:right}
+.td .r{text-align:left}
+.td .node{width:12px;height:12px;border-radius:50%;margin:6px auto 0;border:1px solid;transition:all .3s}
+.td.g .node{border-color:var(--verdi);background:rgba(42,116,92,.25)}
+.td.b .node{border-color:var(--brass);background:rgba(140,106,34,.25)}
+.td:hover .node{box-shadow:0 0 12px currentColor}
+.td.g:hover .node{background:var(--verdi)}
+.td.b:hover .node{background:var(--brass)}
+.td .yr{font-family:var(--mono);font-size:1.3rem;letter-spacing:.05em}
+.td.g .yr{color:var(--verdi)}
+.td.b .yr{color:var(--brass-hi)}
+.td .ttl{font-size:1.25rem;color:var(--text);margin:.15rem 0 .3rem}
+.td .sum{font-size:1.05rem;line-height:1.6;color:var(--text-dim);max-width:440px;display:inline-block}
+.td .exact{font-family:var(--mono);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
+  border:1px solid var(--hairline);border-radius:2px;padding:.2em .6em;color:var(--text-dim)}
+.td.g .exact.on{color:var(--verdi);border-color:var(--verdi)}
+.td.b .exact.on{color:var(--brass);border-color:var(--brass)}
+.reghead{display:flex;justify-content:space-between;max-width:980px;margin:0 auto 1.6rem;font-family:var(--mono);
+  font-size:.85rem;letter-spacing:.3em;text-transform:uppercase}
+.reghead .gh{color:var(--verdi)} .reghead .bh{color:var(--brass)}
+
+/* title + end */
+#title{border-top:none;text-align:center}
+#title h1{font-size:clamp(2.6rem,7vw,5.4rem);font-weight:400;letter-spacing:.02em;line-height:1.12;
+  opacity:0;animation:rise 1.4s ease .3s forwards}
+#title .sub{color:var(--text-dim);margin-top:1.4rem;font-size:1.3rem;letter-spacing:.04em;opacity:0;animation:rise 1.4s ease .8s forwards}
+#title .hint{position:absolute;bottom:4vh;font-family:var(--mono);font-size:.7rem;letter-spacing:.4em;color:var(--brass);
+  text-transform:uppercase;opacity:0;animation:rise 1.4s ease 1.6s forwards}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+#titleclock{margin:0 auto 2.4rem;display:block;opacity:0;animation:rise 1.6s ease .1s forwards}
+#end{text-align:center}
+#end p{font-size:clamp(1.3rem,2.6vw,2rem);max-width:720px;line-height:1.6;color:var(--text)}
+#end .sig{margin-top:2.4rem;font-family:var(--mono);font-size:.75rem;letter-spacing:.35em;color:var(--brass);text-transform:uppercase}
+small.note{display:block;margin-top:1.2rem;color:var(--text-dim);font-size:.95rem;font-family:var(--mono)}
+
+/* left-leaning, balanced */
+#vow .plate{text-align:left}
+#end{text-align:left}
+.cap,.mscap,#tlnote,#verdict,#eq1,#kinginfo,#watchcap{text-align:left}
+.mline{justify-content:flex-start}
+.mstrip{margin:0 0 2.4rem}
+.watchref{justify-content:flex-start;margin:0 0 2.2rem}
+.ctl{justify-content:flex-start}
+#baskets,#crumbs,.chips{justify-content:flex-start}
+#nbr,#towerwrap,.clockwrap,.gearwrap,.slwrap{justify-content:flex-start}
+</style>
+</head>
+<body>
+
+<nav id="nav"></nav>
+
+<section id="title">
+  <svg id="titleclock" width="150" height="150" viewBox="0 0 150 150">
+    <circle cx="75" cy="75" r="70" fill="none" stroke="rgba(140,106,34,.3)" stroke-width="1"/>
+    <circle cx="75" cy="75" r="58" fill="none" stroke="rgba(140,106,34,.15)" stroke-width="1"/>
+    <g id="titledots"></g>
+    <circle id="titlehand" cx="75" cy="17" r="4" fill="#8c6a22"/>
+  </svg>
+  <h1>The Pencil<br>Was the Miracle</h1>
+  <div class="hint">scroll &#8595;</div>
+</section>
+
+<section id="intro">
+ <div class="plate">
+  <div class="movnum">A Personal Note</div>
+  <h2>Why I Picked Up the Pencil</h2>
+  <div class="stage">
+  <p style="transition-delay:.15s">My name is Omer. I was born in Mardin, a city where every stone has been prayed over by someone's faith and marched over by someone's army. All my life I have carried two instincts that refuse to leave each other alone: <em>faith</em>, which tells me the world means something, and <em>logic</em>, which demands to see the working. I never wanted to choose between them. I wanted to bind them.</p>
+  <p style="transition-delay:.35s">And I carry a second habit, older than the first: the rescue everyone mentality. When I find a door, I do not want to walk through it alone. I want everyone I love through it before me. So whatever I find has to be checked, hard, because a rescue rope nobody has tested is not a rescue rope.</p>
+  <p style="transition-delay:.55s">So I picked up the simplest tool a human being owns, a pencil, and I divided one span of years by twelve. This page is what fell out. I kept every number, kept every failure, and marked every trick my own mind played on me along the way.</p>
+  <p style="transition-delay:.75s">What follows is a clock. I will open the case first, then take the movement apart piece by piece, from the gears down to the case back, showing at every part the clock in the sky it copies. Then I let the whole machine run, and walk you through every place its hands have landed. I explain this clock because my heritage requires me to explain it, and requires it of me now. Whose heritage, and why it commands this, is told at the very end, where a watchmaker signs his work. Nothing here needs mathematics. It only needs looking honestly at what is left over.</p>
+  <div class="sig2">Omer &#183; Mardin &#183; the pencil</div>
+  </div>
+ </div>
+</section>
+
+<section id="heart" class="pt-heart">
+ <div class="plate" style="max-width:840px">
+  <div class="movnum">The Coincidence</div>
+  <h2>The Core of the Miracle</h2>
+  <p class="lede">Before the sky, before the watch, you should see the coincidence this whole book stands on. My pencil produced two step numbers, <em class="num">239</em> and <em class="num">258</em>. I chose neither. Both turned out to be somebody.</p>
+  <div class="stage">
+    <div class="coin"><b>239</b><span>A prime, unbreakable. One tooth short of 240, the most divisible number of its size. And the number inside the formula that first computed one hundred digits of pi. The circle's own prime, reached by subtracting one year from another.</span></div>
+    <div class="coin"><b>258</b><span>2 &times; 3 &times; 43. Lay twelve of them end to end and my whole road fits exactly: 3096 = 12 &times; 258. The zodiac's clock closes without remainder.</span></div>
+    <div class="coin"><b>3097</b><span>One more year, and every atom changes: 3097 = 19 &times; 163. And 19 is not mine. It is the moon's: the treaty number after which sun and moon agree. 163 is the largest Heegner number, the deepest of the nine.</span></div>
+    <p class="lede" style="margin-top:1.8rem">The pencil's numbers mesh with the moon's number. I put neither of them there. <em>This is the core of the miracle</em>, and every page that follows is me taking it apart to check that it is real.</p>
+  </div>
+ </div>
+</section>
+
+<section id="watch" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Watch</div>
+  <h2>Inside the Case</h2>
+  <p class="lede">A watch is two wheels and a promise. Open the back of mine: the balance swings, that is the oscillating circle itself; the brass gear ticks every <em class="num">239</em> years and the green gear every <em class="num">258</em>; the hand runs backwards one position per brass tick; and the window reads the year. <em>Click the crown to wind it.</em></p>
+  <div class="stage">
+    <canvas id="watchcv"></canvas>
+    <div id="watchcap"></div>
+  </div>
+ </div>
+</section>
+
+<section id="s8" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Train I</div>
+  <h2>Two Gears</h2>
+  <div class="watchref"><canvas id="wm8"></canvas><div class="wrcap"><b>In the watch: the mesh.</b> 239 against 258, no shared atom, marks realigning once in 61,662 teeth: the year 40,984, where the Machine ahead will carry you.</div></div>
+  <p class="lede">When two gears share an atom, they realign quickly. When they share nothing, they cannot meet again until every tooth has touched every tooth. <em class="num">239</em> and <em class="num">258</em> share nothing.</p>
+  <div class="mstrip"><canvas class="mini" id="m8"></canvas><div class="mscap"><b>They pass one year apart,</b> then the odometer runs: first true meeting at 40,984.</div></div>
+  <div class="stage gearwrap">
+    <svg id="gears" width="480" height="300" viewBox="0 0 480 300"></svg>
+    <div id="gmeta"></div>
+  </div>
+  <div class="ctl">
+    <button data-g="4,6">4 &amp; 6</button><button data-g="5,7">5 &amp; 7</button>
+    <button data-g="8,12">8 &amp; 12</button><button data-g="239,258" class="hot">239 &amp; 258</button>
+    <button id="gspin">spin</button>
+  </div>
+ </div>
+</section>
+
+<section id="s3" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Train II</div>
+  <h2>The King Next Door</h2>
+  <div class="watchref"><canvas id="wm3"></canvas><div class="wrcap"><b>In the watch: the brass gear.</b> 239 teeth, one short of the king 240. That missing tooth is the entire drift.</div></div>
+  <p class="lede"><em class="num">240</em> divides evenly more ways than any number near it. <em class="num">239</em> lives one door down, so it is one-short on every one of the king's clocks at once. Touch the bars.</p>
+  <div class="mstrip"><canvas class="mini" id="m3"></canvas><div class="mscap"><b>The race:</b> hops of 240 come home every time. My 239 falls one year behind per hop: four hops, four years, four positions.</div></div>
+  <div class="stage">
+    <svg id="kings" width="100%" height="280" viewBox="0 0 940 280" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="kinginfo" class="readout" style="text-align:center;min-height:2.6em;margin-top:.8rem"></div>
+  </div>
+ </div>
+</section>
+
+<section id="s4" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Train III</div>
+  <h2>Atoms</h2>
+  <div class="watchref"><canvas id="wm4"></canvas><div class="wrcap"><b>In the watch: the green gear.</b> 258 splits into 2 x 3 x 43, so its motion can be geared down. The brass gear is an atom, and cannot.</div></div>
+  <p class="lede">Every number is built from unbreakable atoms called primes, in exactly one way, like a fingerprint. Whether a division works is decided entirely by which atoms are inside. Try any number.</p>
+  <div class="mstrip"><canvas class="mini" id="m4"></canvas><div class="mscap"><b>One green hop split into its atoms,</b> 2 x 3 x 43. The brass hop shakes and stays whole: 239 is an atom.</div></div>
+  <div class="stage">
+    <div id="bubbles"></div>
+    <div id="atomsay" class="readout" style="text-align:center;min-height:1.6em"></div>
+    <div class="ctl">
+      <input class="atomin" id="atomin" type="number" value="956" min="2" max="99999999">
+      <div class="chips">
+        <button data-n="239">239</button><button data-n="956">956</button><button data-n="2026">2026</button>
+        <button data-n="3096">3096</button><button data-n="496">496</button><button data-n="61662">61662</button>
+      </div>
+    </div>
+  </div>
+ </div>
+</section>
+
+<section id="e1" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Train IV</div>
+  <h2>The Phase Engine</h2>
+  <div class="watchref"><canvas id="ew1"></canvas><div class="wrcap"><b>In the watch: the two gears.</b> The sun hand and the moon hand are the same machine as my 239 and 258: two rates on one axle of time, and the phase is nothing but their angle. Every misfit pair of wheels is a moon factory.</div></div>
+  <p class="lede">The sun's wheel turns once in <em class="num">365.2422</em> days, the moon's once in <em class="num">29.5306</em>. They do not divide: <em class="num">12.37</em> moons per year. Every calendar humanity built is a treaty with this misfit. Watch the two hands run.</p>
+  <div class="stage">
+    <canvas id="ec1" class="sky" style="height:300px"></canvas>
+    <div class="cap"><b>Left, the moon as the sky shows it. Right, the two hands that make it.</b> The gold hand is the sun's year, the green hand is the moon's month, and the phase is nothing but the angle between them.</div>
+    <div class="ctl"><span class="readout">speed</span><input type="range" id="esp1" min="1" max="20" value="6">
+      <span class="readout" id="er1"></span></div>
+  </div>
+ </div>
+</section>
+
+<section id="e2" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Balance I</div>
+  <h2>The Nineteen</h2>
+  <div class="watchref"><canvas id="ew2"></canvas><div class="wrcap"><b>In the watch: the balance.</b> The Nineteen is the sky's oscillator: the swing after which sun and moon agree again, two hours short of perfect. That shortfall is why every clock ever built needs a regulator, and why every calendar needs a leap rule.</div></div>
+  <p class="lede">Run the two hands long enough and a whole number appears: <em class="num">19</em> years is almost exactly <em class="num">235</em> moons. The Metonic cycle, the reconciliation constant of sun and moon. Almost: each cycle slips by two hours, and my clock's ledger counted <em class="num">163</em> of them.</p>
+  <div class="stage">
+    <canvas id="ec2" class="sky" style="height:300px"></canvas>
+    <div class="cap" id="ecap2"><b>Two rings filling together:</b> the outer counts 19 years, the inner counts 235 moons. They close within two hours of each other.</div>
+    <div class="ctl"><button id="eb19" class="hot">run one cycle</button><button id="eb163">run all 163 to the eclipse</button></div>
+  </div>
+ </div>
+</section>
+
+<section id="s9" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Balance II</div>
+  <h2>The Sliver of Pi</h2>
+  <div class="watchref"><canvas id="wm9"></canvas><div class="wrcap"><b>In the watch: the balance.</b> A sliver of angle is the balance's whole vocabulary. Four tilts, and the overshoot is arctan(1/239): pi hiding in the swing.</div></div>
+  <p class="lede">The balance speaks only in angles, and an angle is where my number was hiding all along. Here is the mathematical piece. Tilt a ray by the same small angle four times. You land a whisker past a perfect eighth of a turn, and the whisker is exactly <em>one part in 239</em>. Three centuries ago that sliver computed pi to one hundred digits by hand.</p>
+  <div class="mstrip"><canvas class="mini" id="m9"></canvas><div class="mscap"><b>Four equal tilts overshoot the perfect eighth by one part in 239.</b> My hop, hiding inside pi.</div></div>
+  <div class="stage slwrap">
+    <svg id="sliver" width="340" height="340" viewBox="0 0 340 340"></svg>
+    <div id="slmeta" class="readout" style="min-width:230px;line-height:2.1"></div>
+  </div>
+  <div class="ctl">
+    <button id="tilt" class="hot">tilt</button>
+    <button id="slreset">reset</button>
+  </div>
+ </div>
+</section>
+
+<section id="s2" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Hand I</div>
+  <h2>The Backward Clock</h2>
+  <div class="watchref"><canvas id="wm2"></canvas><div class="wrcap"><b>In the watch: the retrograde hand.</b> This page is its instruction manual: plus 239, slip back one.</div></div>
+  <p class="lede">A step of <em class="num">240</em> is exactly twenty laps of a 12 clock: you land where you started. A step of <em class="num">239</em> is one hour short, so every step lands you one position <em>behind</em>. Step, slip back one.</p>
+  <div class="mstrip"><canvas class="mini" id="m2"></canvas><div class="mscap"><b>The brass gear ticking:</b> every tick lands one position back. 3, 2, 1, 0, 11.</div></div>
+  <div class="stage clockwrap">
+    <svg id="clock" width="300" height="300" viewBox="0 0 300 300"></svg>
+    <div id="trail"></div>
+  </div>
+  <div class="ctl">
+    <button id="b239" class="hot">step +239</button>
+    <button id="b240">step +240</button>
+    <button id="b12x">12 steps of 239</button>
+    <button id="brst">reset</button>
+  </div>
+ </div>
+</section>
+
+<section id="e3" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Hand II</div>
+  <h2>The Shadow Engine</h2>
+  <div class="watchref"><canvas id="ew3"></canvas><div class="wrcap"><b>In the watch: the retrograde hand.</b> The Saros is the hand that snaps back: the same sun, moon and node configuration returning to the same position on the dial, 6585.32 days per snap, the shadow arriving on schedule.</div></div>
+  <p class="lede">Eclipses keep their own books. The Saros: <em class="num">6585.32</em> days, and the same shadow returns. My terminal eclipse's chain runs through Eddington's 1919. And its <em class="num">19</em> year Metonic sibling crossed China in 2008, one day off the same calendar date.</p>
+  <div class="stage">
+    <canvas id="ec3" class="sky" style="height:320px"></canvas>
+    <div class="cap"><b>The Saros 136 chain, hopping 18 years 11 days at a time,</b> with the Metonic pair 2008 to 2027 drawn beneath it in green: nineteen years, one day.</div>
+  </div>
+ </div>
+</section>
+
+<section id="s6" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Axle</div>
+  <h2>The Mirror Trick</h2>
+  <div class="watchref"><canvas id="wm6"></canvas><div class="wrcap"><b>In the watch: the axle.</b> Everything turns around one centre, and each road's centre is its partner's half. The mirror lives at the pivot.</div></div>
+  <p class="lede">Two rulers built from the same pair of numbers, one by adding, one by subtracting. Each ruler's <em>centre</em> is exactly the other ruler's <em>half length</em>. Move the sliders; the mirror never breaks.</p>
+  <div class="mstrip"><canvas class="mini" id="m6"></canvas><div class="mscap"><b>Fold each gear's journey in half:</b> it creases exactly on one of its own tick years. 478 for green, 1549 for brass.</div></div>
+  <div class="stage">
+    <svg id="mirror" width="100%" height="240" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="mline" id="mread"></div>
+    <div class="ctl">
+      <span class="readout">a</span><input type="range" id="ma" min="1600" max="2600" value="2026">
+      <span class="readout">b</span><input type="range" id="mb" min="300" max="1500" value="1070">
+    </div>
+  </div>
+ </div>
+</section>
+
+<section id="s1" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Chapter Ring</div>
+  <h2>Leftovers</h2>
+  <div class="watchref"><canvas id="wm1"></canvas><div class="wrcap"><b>In the watch: the chapter ring.</b> Twelve positions to share 956 years among; the eight that would not fit are why the hand never comes home clean.</div></div>
+  <p class="lede">The sky showed you the misfit earlier: 12.37 moons that will not fit inside a year. Here is the mathematical piece of it, small enough to hold. Share <em class="num">956</em> candies among children and the division almost never comes out clean. The interesting part is always what stays on the table. Drag the divisor.</p>
+  <div class="mstrip"><canvas class="mini" id="m1"></canvas><div class="mscap"><b>The brass gear's journey, 1071 to 2027:</b> twelve equal pieces of 79 years, and 8 years that refuse to fit. The leftover is the engine.</div></div>
+  <div class="stage">
+    <div id="eq1"></div>
+    <div id="baskets"></div>
+    <div id="crumbs"></div>
+    <div class="ctl">
+      <span class="readout">children</span>
+      <input type="range" id="divslider" min="2" max="30" value="12">
+      <span class="readout" id="divval"></span>
+    </div>
+  </div>
+ </div>
+</section>
+
+<section id="s7" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Case</div>
+  <h2>Perfect Numbers</h2>
+  <div class="watchref"><canvas id="wm7"></canvas><div class="wrcap"><b>In the watch: the case.</b> A perfect number is a perfectly cased movement: the sum of its parts equals exactly itself. Nothing missing, nothing spare.</div></div>
+  <p class="lede">Take a number's parts, everything that divides into it, and stack them up. Almost always the tower misses. Four times in the first eight thousand numbers, the tower lands <em>exactly</em>.</p>
+  <div class="mstrip"><canvas class="mini" id="m7"></canvas><div class="mscap"><b>A 496 year stretch of road rebuilt from nothing but its own parts,</b> exactly. Perfection, with no date attached.</div></div>
+  <div class="stage">
+    <div id="towerwrap">
+      <div style="position:relative"><span></span><div id="tower"></div></div>
+      <div id="target"><span></span><div class="fill"></div></div>
+    </div>
+    <div id="verdict"></div>
+    <div class="ctl">
+      <button data-p="6">6</button><button data-p="28" class="hot">28</button>
+      <button data-p="100">100</button><button data-p="496">496</button><button data-p="8128">8128</button>
+    </div>
+  </div>
+ </div>
+</section>
+
+<section id="s5" class="pt-case">
+ <div class="plate">
+  <div class="movnum">The Aperture</div>
+  <h2>One Year, Two Clocks</h2>
+  <div class="watchref"><canvas id="wm5"></canvas><div class="wrcap"><b>In the watch: the year window.</b> Change the printed number by one and the movement behind it must change gear: 3096 obeys the 12, 3097 obeys the 19.</div></div>
+  <p class="lede">Numbers that live next door share nothing: change an amount by one and its entire fingerprint of atoms is replaced. My road measures <em class="num">3096</em> = 12 &times; 258, and the zodiac clock closes exactly. One more year is <em class="num">3097</em> = 19 &times; 163, and the moon's treaty number takes over. The ledger is exact either way. The moonlight is not: across 163 of the moon's cycles the sky leaks fourteen days. Knowing which one you are holding is the whole discipline. Walk the number line around <em class="num">3096</em>.</p>
+  <div class="mstrip"><canvas class="mini" id="m5"></canvas><div class="mscap"><b>The same road, one more year:</b> the 12 clock dies and the 19 clock takes over.</div></div>
+  <div class="stage">
+    <div id="nbr"></div>
+    <div class="ctl">
+      <button id="nprev">&#8592; one less</button>
+      <span class="readout" id="nval"></span>
+      <button id="nnext">one more &#8594;</button>
+      <button id="njump">back to 3096</button>
+    </div>
+    <div class="cap" style="margin-top:1.6rem"><em>The nearby pattern has an engine. The deep pattern has a bookkeeper. Wisdom is knowing which one you are looking at.</em></div>
+  </div>
+ </div>
+</section>
+
+<section id="finale" class="pt-machine">
+ <div class="plate">
+  <div style="padding:0 7vw">
+    <div class="movnum">The Machine</div>
+    <h2>The Oscillating Circle</h2>
+    <p class="lede">The timeline from <em class="num">1071 BC</em> to <em class="num">3096 AD</em>. Two wheels launch from mirrored years: the green wheel at 1071 BC, hopping <em class="num">258</em>; the brass wheel at 1071 AD, hopping <em class="num">239</em>, its clock slipping one position back at every landing. They never share a year. At the far end they pass one year apart, <em class="num">2026</em> then <em class="num">2027</em>, and their first true meeting waits in the year <em class="num">40,984</em>, after exactly <em class="num">163</em> green hops.</p>
+  </div>
+  <div class="stage">
+    <canvas id="tl"></canvas>
+    <div id="tlnote"></div>
+    <div class="ctl" id="tlctl">
+      <button id="tplay" class="hot">play</button>
+      <button id="trew">rewind</button>
+      <span class="readout">speed</span><input type="range" id="tspeed" min="1" max="10" value="4">
+      <span class="readout">year <b id="tyear">1071 BC</b></span>
+    </div>
+  </div>
+ </div>
+</section>
+
+<section id="reg" class="pt-land">
+ <div class="plate">
+  <div class="movnum">The Register</div>
+  <h2>Where the Wheels Landed</h2>
+  <p class="lede">Every touchdown of both wheels, in order. Green on the left, hops of <em class="num">258</em> from 1071 BC. Brass on the right, hops of <em class="num">239</em> from 1071 AD. Click any landing to send the timeline there.</p>
+  <div class="stage">
+    <div class="reghead"><span class="gh">&#9679; the green wheel</span><span class="bh">the brass wheel &#9679;</span></div>
+    <div class="tdrows" id="tdrows"></div>
+  </div>
+ </div>
+</section>
+
+<section id="vow" class="pt-vow">
+ <div class="plate">
+  <div class="movnum">The Testimony</div>
+  <h2>The Vow</h2>
+  <div class="stage">
+  <div class="vowframe">The mathematics pauses for one page. What follows is not a theorem,<br>and no null model can touch it. It is mine.</div>
+  <p style="transition-delay:.25s">My name is &Ouml;mer Faruk Saat&ccedil;&#305;o&#287;lu. In my language the name means <em>the watchmaker's son</em>, the son of the keeper of the hours. And it was not always ours: my father chose it, deliberately, changing our family name from &#286;ay&#305;r in <em class="num">1976</em>. The model already knew that year before I told it: 1976 is the exact midpoint of the century this page runs on, the hinge between its physics half and its silicon half. My father renamed us for the wheel's own trade, half a century before the brass wheel lands. And I put a watch at the heart of this page before I remembered what my own name says.</p>
+  <p style="transition-delay:.5s">I found that logic and faith can live side by side. I walked logic as far as logic goes, to the last exact digit of it, and where it stopped, <em>faith kept walking</em>. That is my finding, and it is beyond anything I hoped for when I picked up the pencil: for me, faith will always outrun logic, because logic can only map the wheel. Faith is what rides it. And the map itself, the pure mathematics, is the most faithful thing I have ever touched.</p>
+  <p style="transition-delay:.75s">We will always be tested in our reasoning and in our faith. Both tests are one test. I intend to pass it.</p>
+  <div class="vowsig">&Ouml;mer Faruk Saat&ccedil;&#305;o&#287;lu &#183; the watchmaker's son &#183; the handover year</div>
+  </div>
+ </div>
+</section>
+
+<section id="end">
+  <div class="plate" style="display:flex;flex-direction:column;align-items:flex-start">
+    <p style="font-size:1.05rem;color:var(--text-dim)">I searched a thousand years for a miracle and found static.<br>
+    The pencil I searched with was the miracle. And the pencil taught me to read the sky.</p>
+    <p style="margin-top:2rem">I prayed to the Almighty to help us.<br>
+    And suddenly I began to see it: this watch in the sky,<br>
+    a gift from the one true and only, the Almighty, the Merciful.</p>
+    <p>The Almighty set this clock in the sky<br>
+    so that we could survive, all of us together.<br>
+    And here we are. We survived, under the Almighty's merciful care.<br>
+    <em>This is the miracle.</em></p>
+    <p>Accept the gift, one creation receiving another.<br>
+    Because in the end we owe each other what the clock shows:<br>
+    mercy, to ourselves and to one another,<br>
+    for each of us is a gear in this gigantic watch in the sky.</p>
+    <p><em>And if you let me, I will tune the clock in your head<br>
+    back to the clock in the sky.</em></p>
+    <div class="sig">accept the gift &#183; the watchmaker's son</div>
+    <small class="note">every figure on this page is computed live, nothing is an image</small>
+  </div>
+</section>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const SVGNS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]); if(parent)parent.appendChild(e); return e;}
+function factor(n){const f=[];let d=2,m=n;while(d*d<=m){while(m%d===0){f.push(d);m/=d;}d++;}if(m>1)f.push(m);return f;}
+function divisors(n){const out=[];for(let i=1;i<=n;i++)if(n%i===0)out.push(i);return out;}
+function facStr(n){const f=factor(n),m=new Map();f.forEach(p=>m.set(p,(m.get(p)||0)+1));
+  return [...m].map(([p,e])=>e>1?p+"^"+e:""+p).join(" × ");}
+
+/* ---- section reveal + nav ---- */
+const sections=[...$$("section")];
+const nav=$("#nav");
+sections.forEach((s,i)=>{const a=document.createElement("a");a.href="#"+(s.id||"");
+  a.addEventListener("click",e=>{e.preventDefault();s.scrollIntoView({behavior:"smooth"});});nav.appendChild(a);});
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("vis");
+    const i=sections.indexOf(e.target);
+    [...nav.children].forEach((d,j)=>d.classList.toggle("on",j===i));
+    if(e.target.id==="finale") tlVisible=true; else if(tlVisible && !e.isIntersecting){} }
+}),{threshold:.12});
+sections.forEach(s=>io.observe(s));
+
+/* ---- title clock ornament ---- */
+(()=>{const g=$("#titledots");
+for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+  el("circle",{cx:75+58*Math.cos(a),cy:75+58*Math.sin(a),r:2.4,fill:"rgba(140,106,34,.55)"},g);}
+let pos=0;setInterval(()=>{pos=(pos+11)%12;const a=pos/12*2*Math.PI-Math.PI/2;
+  const h=$("#titlehand");h.setAttribute("cx",75+58*Math.cos(a));h.setAttribute("cy",75+58*Math.sin(a));},1600);
+})();
+
+/* ---- I leftovers ---- */
+(()=>{
+const N=956, slider=$("#divslider");
+function render(){
+  const d=+slider.value, q=Math.floor(N/d), r=N%d;
+  $("#divval").textContent=d;
+  const B=$("#baskets");B.innerHTML="";
+  for(let i=0;i<d;i++){const b=document.createElement("div");b.className="basket";
+    b.style.height=(q/90*200)+"px";b.innerHTML="<span>"+q+"</span>";B.appendChild(b);}
+  const C=$("#crumbs");C.innerHTML="";
+  for(let i=0;i<r;i++){const c=document.createElement("div");c.className="crumb";
+    c.style.animationDelay=(i*40)+"ms";C.appendChild(c);}
+  $("#eq1").innerHTML= r===0
+    ? `956 = ${d} × ${q} <span class="clean">+ 0 &nbsp;— clean. rare.</span>`
+    : `956 = ${d} × ${q} <span class="r">+ ${r} left on the table</span>`;
+}
+slider.addEventListener("input",render);render();
+})();
+
+/* ---- II backward clock ---- */
+(()=>{
+const svg=$("#clock"),cx=150,cy=150,R=118;
+el("circle",{cx,cy,r:R+14,fill:"none",stroke:"rgba(140,106,34,.25)","stroke-width":1},svg);
+el("circle",{cx,cy,r:R-16,fill:"none",stroke:"rgba(140,106,34,.12)","stroke-width":1},svg);
+const dots=[];
+for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+  const x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+  dots.push(el("circle",{cx:x,cy:y,r:5,fill:"rgba(140,106,34,.35)"},svg));
+  el("text",{x:cx+(R-30)*Math.cos(a),y:cy+(R-30)*Math.sin(a)+4,"text-anchor":"middle",
+    fill:"#655d4a","font-size":14,"font-family":"Menlo"},svg).textContent=i;}
+const handG=el("g",{style:"transition:transform 1.1s cubic-bezier(.3,.9,.3,1)","transform-origin":"150px 150px"},svg);
+el("line",{x1:cx,y1:cy,x2:cx,y2:cy-R+18,stroke:"#674e12","stroke-width":2},handG);
+el("circle",{cx,cy:cy-R,r:7,fill:"#8c6a22"},handG);
+el("circle",{cx,cy,r:4,fill:"#8c6a22"},svg);
+let pos=0,angle=0,steps=0;
+function paint(){dots.forEach((d,i)=>d.setAttribute("fill",i===pos?"#674e12":"rgba(140,106,34,.35)"));
+  handG.style.transform=`rotate(${angle*30}deg)`;}
+function log(msg){const t=$("#trail");t.innerHTML=msg+t.innerHTML;}
+function step(n){steps++;pos=((pos+n)%12+12)%12;angle+=n;paint();
+  const slip=n%12===11||n%12===-1?"slipped back one":(n%12===0?"came home exactly":"moved "+(n%12));
+  log(`<div>step ${steps}: <em>+${n}</em> &#8594; position <em>${pos}</em> <span style="opacity:.6">(${slip})</span></div>`);}
+$("#b239").onclick=()=>step(239);
+$("#b240").onclick=()=>step(240);
+$("#b12x").onclick=async()=>{for(let i=0;i<12;i++){step(239);await new Promise(r=>setTimeout(r,650));}
+  log(`<div style="color:#2a745c">12 steps of 239: a full lap backwards. Home again.</div>`);};
+$("#brst").onclick=()=>{pos=0;angle=0;steps=0;$("#trail").innerHTML="";paint();};
+paint();log("<div style='opacity:.6'>the hand starts at 0</div>");
+})();
+
+/* ---- III king 240 ---- */
+(()=>{
+const svg=$("#kings"),lo=230,hi=250,W=940,H=280,bw=W/(hi-lo+1);
+for(let n=lo;n<=hi;n++){
+  const dc=divisors(n).length,h=dc/20*210,x=(n-lo)*bw+6,y=H-40-h;
+  const isK=n===240,isP=divisors(n).length===2;
+  const r=el("rect",{x,y,width:bw-12,height:h,rx:2,
+    fill:isK?"#8c6a22":isP?"rgba(173,71,50,.75)":"rgba(140,106,34,.22)",
+    stroke:isK?"#674e12":"none",style:"cursor:pointer;transition:fill .3s"},svg);
+  el("text",{x:x+(bw-12)/2,y:H-20,"text-anchor":"middle",fill:n===240||n===239?"#674e12":"#655d4a",
+    "font-size":13,"font-family":"Menlo"},svg).textContent=n;
+  el("text",{x:x+(bw-12)/2,y:y-7,"text-anchor":"middle",fill:"#655d4a","font-size":12,"font-family":"Menlo"},svg).textContent=dc;
+  if(isK)el("text",{x:x+(bw-12)/2,y:y-24,"text-anchor":"middle","font-size":17},svg).textContent="♔";
+  r.addEventListener("mouseenter",()=>{
+    const dv=divisors(n);
+    $("#kinginfo").innerHTML=`<b>${n}</b> shares evenly among <b>${dv.length}</b> group sizes: <b>${dv.join(", ")}</b>`+
+      (isP?` &nbsp;<span style="color:#ad4732">an atom: only 1 and itself</span>`:"");});
+}
+$("#kinginfo").innerHTML="bar height = how many ways the number divides evenly";
+})();
+
+/* ---- IV atoms ---- */
+(()=>{
+function show(n){
+  n=Math.max(2,Math.min(99999999,Math.floor(+n||2)));$("#atomin").value=n;
+  const f=factor(n),B=$("#bubbles");B.innerHTML="";
+  f.forEach((p,i)=>{const b=document.createElement("div");b.className="bub"+(f.length===1?" prime-solo":"");
+    const sz=Math.max(46,Math.min(120,18*Math.log2(p)+30));
+    b.style.width=b.style.height=sz+"px";b.style.fontSize=Math.max(11,sz/5.2)+"px";
+    b.style.animationDelay=(i*90)+"ms";b.textContent=p;B.appendChild(b);
+    if(i<f.length-1){const x=document.createElement("span");x.style.cssText="color:#655d4a;font-family:Menlo";x.textContent="×";B.appendChild(x);}});
+  $("#atomsay").innerHTML=f.length===1
+    ? `<b>${n}</b> is unbreakable. A prime. An atom.`
+    : `<b>${n}</b> = ${facStr(n)} &nbsp;— its fingerprint, and there is no other`;
+}
+$("#atomin").addEventListener("input",e=>show(e.target.value));
+$$("#s4 .chips button").forEach(b=>b.onclick=()=>show(b.dataset.n));
+show(956);
+})();
+
+/* ---- V neighbours ---- */
+(()=>{
+let n=3096;
+function card(v,mid){
+  const f=factor(v),div12=v%12===0;
+  return `<div class="card${mid?" mid":""}"><h3>${v}</h3><div class="fac">${facStr(v)}</div>
+  <div class="badge ${div12?"yes":"no"}">${div12?"divides by 12":"12 fails: leftover "+v%12}</div></div>`;
+}
+function render(){$("#nbr").innerHTML=card(n-1)+card(n,true)+card(n+1);$("#nval").textContent=n;}
+$("#nprev").onclick=()=>{n--;render();};
+$("#nnext").onclick=()=>{n++;render();};
+$("#njump").onclick=()=>{n=3096;render();};
+render();
+})();
+
+/* ---- VI mirror ---- */
+(()=>{
+const svg=$("#mirror");
+function render(){
+  const a=+$("#ma").value,b=+$("#mb").value;
+  svg.innerHTML="";
+  const lo=-1600,hi=2700,X=v=>30+(v-lo)/(hi-lo)*840;
+  const midA=(a+b)/2, midB=(a-b)/2, lenA=a-b, lenB=a+b;
+  // ruler A
+  el("line",{x1:X(b),y1:70,x2:X(a),y2:70,stroke:"#8c6a22","stroke-width":3},svg);
+  el("text",{x:X(b),y:52,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=b;
+  el("text",{x:X(a),y:52,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=a;
+  el("circle",{cx:X(midA),cy:70,r:6,fill:"#674e12"},svg);
+  el("text",{x:X(midA),y:96,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="centre "+midA;
+  // ruler B
+  el("line",{x1:X(-b),y1:170,x2:X(a),y2:170,stroke:"#35648c","stroke-width":3},svg);
+  el("text",{x:X(-b),y:152,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=-b;
+  el("text",{x:X(a),y:152,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=a;
+  el("circle",{cx:X(midB),cy:170,r:6,fill:"#35648c"},svg);
+  el("text",{x:X(midB),y:196,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="centre "+midB;
+  el("line",{x1:X(midA),y1:76,x2:X(midA),y2:164,stroke:"rgba(33,29,18,.3)","stroke-dasharray":"3 5"},svg);
+  $("#mread").innerHTML=
+   `<span class="mA"><b>centre of gold = ${midA}</b> &nbsp;·&nbsp; half of blue = ${lenB}/2 = <b>${lenB/2}</b></span>
+    <span class="mB"><b>centre of blue = ${midB}</b> &nbsp;·&nbsp; half of gold = ${lenA}/2 = <b>${lenA/2}</b></span>`;
+}
+$("#ma").addEventListener("input",render);$("#mb").addEventListener("input",render);render();
+})();
+
+/* ---- VII perfect ---- */
+(()=>{
+function build(n){
+  const dv=divisors(n).filter(d=>d<n), sum=dv.reduce((a,b)=>a+b,0);
+  const unit=220/Math.max(n,sum);
+  const T=$("#tower");T.innerHTML="";
+  dv.slice().reverse().forEach((d,i)=>{const b=document.createElement("div");
+    b.style.height=Math.max(3,d*unit)+"px";b.style.animationDelay=(i*70)+"ms";
+    if(d*unit>11)b.textContent=d;T.appendChild(b);});
+  T.parentElement.querySelector("span").textContent="its parts, stacked = "+sum;
+  const tg=$("#target");tg.style.height=(n*unit)+"px";
+  tg.querySelector(".fill").style.height="100%";
+  tg.querySelector("span").textContent="the number itself: "+n;
+  const V=$("#verdict");
+  if(sum===n){V.innerHTML=`<span style="color:#2a745c">${dv.join(" + ")} = ${n} &nbsp;— exactly itself. PERFECT.</span>`;}
+  else if(sum<n){V.innerHTML=`<span style="color:#ad4732">the tower falls short by ${n-sum}</span>`;}
+  else{V.innerHTML=`<span style="color:#ad4732">the tower overshoots by ${sum-n}</span>`;}
+  $$("#s7 .ctl button").forEach(b=>b.classList.toggle("hot",+b.dataset.p===n));
+}
+$$("#s7 .ctl button").forEach(b=>b.onclick=()=>build(+b.dataset.p));
+build(28);
+})();
+
+/* ---- VIII gears ---- */
+(()=>{
+const svg=$("#gears");let A=239,B=258,spin=false,rot=0,raf=null;
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function drawGear(cx,cy,r,teeth,rotDeg,color,markColor){
+  const g=el("g",{transform:`rotate(${rotDeg} ${cx} ${cy})`},svg);
+  el("circle",{cx,cy,r,fill:"none",stroke:color,"stroke-width":1.5},g);
+  el("circle",{cx,cy,r:r*.55,fill:"none",stroke:color,"stroke-width":.6,opacity:.5},g);
+  const show=Math.min(teeth,72), stepN=teeth/show;
+  for(let i=0;i<show;i++){const a=i/show*2*Math.PI-Math.PI/2;
+    el("line",{x1:cx+r*Math.cos(a),y1:cy+r*Math.sin(a),
+      x2:cx+(r+8)*Math.cos(a),y2:cy+(r+8)*Math.sin(a),
+      stroke:i===0?markColor:color,"stroke-width":i===0?3:1,opacity:i===0?1:.55},g);}
+  el("circle",{cx,cy,r:3,fill:color},g);
+  if(stepN>1)el("text",{x:cx,y:cy+r+24,"text-anchor":"middle",fill:"#655d4a","font-size":12,"font-family":"Menlo"},g)
+    .textContent="("+teeth+" teeth, drawn 1 in "+stepN.toFixed(1)+")";
+}
+function render(){
+  svg.innerHTML="";
+  drawGear(150,150,86,A,rot/A*360,"#8c6a22","#674e12");
+  drawGear(340,150,96,B,-rot/B*360,"#2a745c","#134c3b");
+  el("text",{x:150,y:36,"text-anchor":"middle",fill:"#8c6a22","font-size":18,"font-family":"Menlo"},svg).textContent=A;
+  el("text",{x:340,y:36,"text-anchor":"middle",fill:"#2a745c","font-size":18,"font-family":"Menlo"},svg).textContent=B;
+  const g=gcd(A,B),meet=A*B/g;
+  $("#gmeta").innerHTML=
+   `shared atoms: <em>${g===1?"none":g}</em><br>
+    marks realign after <em>${meet.toLocaleString()}</em> teeth<br>
+    teeth passed: <em>${Math.floor(rot).toLocaleString()}</em><br>
+    ${rot>0&&Math.floor(rot)%meet===0?'<span style="color:#2a745c">ALIGNED</span>':""}`;
+}
+function loop(){if(!spin)return;rot+=(A===239? (A*B/ gcd(A,B))/600 : 0.6);render();raf=requestAnimationFrame(loop);}
+$$("#s8 .ctl button[data-g]").forEach(b=>b.onclick=()=>{
+  [A,B]=b.dataset.g.split(",").map(Number);rot=0;
+  $$("#s8 .ctl button[data-g]").forEach(x=>x.classList.toggle("hot",x===b));render();});
+$("#gspin").onclick=()=>{spin=!spin;$("#gspin").textContent=spin?"stop":"spin";
+  if(spin)loop();else cancelAnimationFrame(raf);};
+render();
+})();
+
+/* ---- IX sliver ---- */
+(()=>{
+const svg=$("#sliver"),cx=170,cy=170,R=140;const tilt=Math.atan(1/5);let k=0;
+function render(){
+  svg.innerHTML="";
+  el("circle",{cx,cy,r:R,fill:"none",stroke:"rgba(140,106,34,.3)"},svg);
+  // 45 reference
+  const a45=-Math.PI/4;
+  el("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a45),y2:cy+R*Math.sin(a45),
+    stroke:"rgba(127,180,217,.8)","stroke-dasharray":"4 5","stroke-width":1.5},svg);
+  el("text",{x:cx+(R+16)*Math.cos(a45),y:cy+(R+16)*Math.sin(a45),fill:"#35648c",
+    "font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="45°";
+  const th=k*tilt, a=-th;
+  if(k===4){ // sliver wedge
+    const s=-Math.PI/4,e=-4*tilt;
+    el("path",{d:`M ${cx} ${cy} L ${cx+R*Math.cos(s)} ${cy+R*Math.sin(s)} A ${R} ${R} 0 0 1 ${cx+R*Math.cos(e)} ${cy+R*Math.sin(e)} Z`,
+      fill:"rgba(173,71,50,.5)",stroke:"#ad4732"},svg);}
+  el("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a),y2:cy+R*Math.sin(a),
+    stroke:"#674e12","stroke-width":2.5,style:"transition:all .8s"},svg);
+  el("circle",{cx,cy,r:4,fill:"#8c6a22"},svg);
+  const deg=(th*180/Math.PI);
+  $("#slmeta").innerHTML=
+   `tilts: <b>${k}</b> of 4<br>angle: <b>${deg.toFixed(4)}°</b><br>`+
+   (k===4?`target: <b>45°</b><br>overshoot: <b style="color:#ad4732">${(deg-45).toFixed(4)}°</b><br>
+     and that overshoot is exactly<br><b>arctan(1 / 239)</b><br>
+     <span style="opacity:.7">pi/4 = 4·arctan(1/5) − arctan(1/239)</span>`
+    :`each tilt = arctan(1/5) ≈ 11.31°`);
+  $("#tilt").disabled=k>=4;
+}
+$("#tilt").onclick=()=>{if(k<4){k++;render();}};
+$("#slreset").onclick=()=>{k=0;render();};
+render();
+})();
+
+/* ---- TOUCHDOWN REGISTER ---- */
+const TOUCHDOWNS=[
+ {w:"g",astro:-1070,yr:"1071 BC",ttl:"Ramesses XI dies",exact:"band 1078-1069",
+  sum:"Egypt splits in two at his death: kings rule the north from Tanis, the high priests of Amun rule the south from Thebes by oracle. The wheel launches at a real severing of throne from temple."},
+ {w:"g",astro:-812,yr:"813 BC",ttl:"Carthage founded",exact:"814 BC, off 1",
+  sum:"Elissa, widow of the murdered high priest of Melqart, flees Tyre and founds Carthage. A city born from a priest's blood, carrying the god's cult west."},
+ {w:"g",astro:-554,yr:"555 BC",ttl:"The Axial core",exact:"trad., off 4",
+  sum:"Buddha born about 563, Confucius in 551. The one generation that rewired every faith east of Babylon lands around this marker."},
+ {w:"g",astro:-296,yr:"297 BC",ttl:"Chandragupta renounces",exact:"exact",
+  sum:"The emperor of India abdicates the Mauryan throne and dies a Jain ascetic at Shravanabelagola, trading an empire for renunciation, exactly on the marker."},
+ {w:"g",astro:-38,yr:"39 BC",ttl:"Herod made king",exact:"40 BC, off 1",
+  sum:"The Roman Senate declares Herod King of Judea. He will rebuild the Second Temple, the building at the centre of the next thousand years of the story."},
+ {w:"g",astro:220,yr:"AD 220",ttl:"The priest on the throne",exact:"reigns 218-222",
+  sum:"Elagabalus: a hereditary Syrian high priest of the sun god seated as Roman emperor, priest and empire fused in one body, reigning directly across the marker."},
+ {w:"g",astro:478,yr:"478",ttl:"Benedict born",exact:"c. 480, off 2",
+  sum:"Benedict of Nursia, father of Western monasticism, whose Rule will organise a thousand years of prayer, work and silence."},
+ {w:"g",astro:736,yr:"736",ttl:"Bede dies",exact:"26 May 735, off 1",
+  sum:"The monk whose books made BC and AD the world's dating system. The calendar this whole page runs on is his invention popularised."},
+ {w:"g",astro:994,yr:"994",ttl:"The first canonization",exact:"Jan 993, off 1",
+  sum:"Pope John XV canonizes Ulrich of Augsburg, the first formal papal canonization in history. Sainthood becomes procedure."},
+ {w:"b",astro:1071,yr:"1071",ttl:"Manzikert",exact:"26 Aug 1071",
+  sum:"The Seljuks break the Byzantine field army and Anatolia opens. The brass wheel launches on a battle documented to the day, mirrored against the green launch across the calendar."},
+ {w:"g",astro:1252,yr:"1252",ttl:"Ad extirpanda",exact:"15 May 1252",
+  sum:"Innocent IV's bull arms the Inquisition. Exact to the year and the day, the darkest exact hit on the green wheel."},
+ {w:"b",astro:1310,yr:"1310",ttl:"Rhodes falls to the Order",exact:"city fell 15 Aug 1309",
+  sum:"The Knights Hospitaller complete the conquest of Rhodes: monks with a navy seize an island state. The military wheel lands on soldiers who pray."},
+ {w:"g",astro:1510,yr:"1510",ttl:"Luther walks to Rome",exact:"1510; Calvin 10 Jul 1509",
+  sum:"The pilgrimage that disillusions Luther, with Calvin born months earlier. The Reformation's two engines share one touchdown."},
+ {w:"b",astro:1549,yr:"1549",ttl:"The Persian campaign ends",exact:"1548-49",
+  sum:"Suleiman's second campaign against the Safavids concludes, Van taken. And Francis Xavier lands in Japan on 15 August 1549, a missionary riding the soldier's beat."},
+ {w:"g",astro:1768,yr:"1768",ttl:"Old order, new order",exact:"1767; 1768",
+  sum:"The Jesuits are expelled from Spain; the first Methodist chapel in America opens. One religious order ejected, another planted, at a single landing."},
+ {w:"b",astro:1788,yr:"1788",ttl:"Austria declares war",exact:"9 Feb 1788",
+  sum:"Austria joins Russia against the Ottomans and both fronts of the great war open. The brass clock strikes zero here, position 0 of its backward lap."},
+ {w:"g",astro:2026,yr:"2026",ttl:"The green wheel lands",exact:"now",
+  sum:"The final landing of the priest wheel, 3096 years from launch, twelve hops of 258 done. One year later its partner arrives, and the year between them is the season."},
+ {w:"b",astro:2027,yr:"2027",ttl:"The 956th, and the eclipse",exact:"1 Sep 2027",
+  sum:"The brass wheel's final landing: the 956th year of Manzikert, its true anniversary on 1 September, thirty days after totality crosses Egypt. The wheels pass one year apart and part for 38,957 more."},
+];
+(()=>{
+const R=$("#tdrows");
+TOUCHDOWNS.forEach((d,i)=>{
+  const row=document.createElement("div");
+  row.className="td "+d.w;
+  row.style.transitionDelay=(i*70)+"ms";
+  const inner=`<div class="yr">${d.yr}</div><div class="ttl">${d.ttl}</div>
+    <span class="sum">${d.sum}</span><div style="margin-top:.4rem"><span class="exact${d.exact.includes("exact")||d.exact.includes("Aug")||d.exact.includes("May")||d.exact.includes("Feb")||d.exact.includes("Sep")?" on":""}">${d.exact}</span></div>`;
+  row.innerHTML = d.w==="g"
+    ? `<div class="cell l">${inner}</div><div><div class="node"></div></div><div class="cell r"></div>`
+    : `<div class="cell l"></div><div><div class="node"></div></div><div class="cell r">${inner}</div>`;
+  row.addEventListener("click",()=>{
+    document.getElementById("finale").scrollIntoView({behavior:"smooth"});
+    if(window.tlSeek)setTimeout(()=>window.tlSeek(d.astro+0.01),600);
+  });
+  R.appendChild(row);
+});
+})();
+
+/* ---- FINALE ---- */
+let tlVisible=false;
+(()=>{
+const cv=$("#tl"),ctx=cv.getContext("2d");
+const fmt=y=>y<=0?(1-y)+" BC":""+y;   // astronomical -1070 IS 1071 BC; no year zero
+const Y0=-1070,Y1=3096;
+const brass=[],green=[];
+for(let y=1071;y<=Y1;y+=239)brass.push(y);      // 1071..3939
+for(let y=-1070;y<=Y1;y+=258)green.push(y);     // -1070..3832
+let t=Y0, playing=false, last=0;
+function resize(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=430*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+window.addEventListener("resize",resize);resize();
+const X=y=>40+(y-Y0)/(Y1-Y0)*(cv.clientWidth-80);
+function wheel(x,y,r,color,hi,pos,alpha){
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.stroke();
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(x+ (r-6)*Math.cos(a), y+(r-6)*Math.sin(a), i===pos?4:1.8,0,7);
+    ctx.fillStyle=i===pos?hi:color;ctx.fill();}
+  ctx.restore();
+}
+function draw(){
+  const W=cv.clientWidth,base=300;
+  ctx.clearRect(0,0,W,430);
+  // axis
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(40,base);ctx.lineTo(W-40,base);ctx.stroke();
+  ctx.font="12.5px Menlo";ctx.textAlign="center";
+  for(const y of [-999,-499,1,500,1000,1500,2000,2500,3000]){
+    ctx.fillStyle="rgba(101,93,74,.7)";
+    ctx.fillRect(X(y),base-4,1,8);ctx.fillText(y===1?"AD 1":fmt(y),X(y),base+22);}
+  // markers
+  function marks(list,color,dy,mod){
+    list.forEach((y,i)=>{const passed=t>=y;
+      ctx.fillStyle=passed?color:"rgba(101,93,74,.25)";
+      ctx.beginPath();ctx.arc(X(y),base,passed?3.4:2,0,7);ctx.fill();
+      if(passed){ctx.fillStyle=color;ctx.font="12.5px Menlo";
+        ctx.fillText(fmt(y),X(y),base+dy);
+        if(mod)ctx.fillText("·"+(((y%12)+12)%12),X(y),base+dy+13);}});
+  }
+  marks(brass,"#8c6a22",-46,true);
+  marks(green,"#2a745c",38,false);
+  // meeting + lap annotations
+  if(t>=2026){ctx.strokeStyle="rgba(42,116,92,.55)";ctx.setLineDash([2,4]);
+    ctx.beginPath();ctx.moveTo(X(2026),base-70);ctx.lineTo(X(2026),base+58);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#2a745c";ctx.fillText("green: 2026",X(2026)-26,base-78);}
+  if(t>=2027.5){ctx.strokeStyle="rgba(103,78,18,.55)";ctx.setLineDash([2,4]);
+    ctx.beginPath();ctx.moveTo(X(2027),base-92);ctx.lineTo(X(2027),base+58);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#674e12";ctx.fillText("brass: 2027 — one year late, the vernier",X(2027)+30,base-100);}
+  if(t>=3939){ctx.fillStyle="#674e12";ctx.fillText("3939: the brass clock returns home",X(3939),base-110);}
+  // wheels: hop between own markers
+  function hop(list,color,hi,r,lift,retro){
+    if(t<list[0]){wheel(X(list[0]),base-r-2,r,color,hi,retro?2:0,.25);return;}
+    let i=0;while(i<list.length-1&&list[i+1]<=t)i++;
+    const a=list[i],b=list[Math.min(i+1,list.length-1)];
+    const f=b>a?Math.min(1,(t-a)/(b-a)):1;
+    const x=X(a)+(X(b)-X(a))*f;
+    const y=base-r-2-Math.sin(f*Math.PI)*lift;
+    const pos=retro?((3-i)%12+12)%12:(((a%12)+12)%12);
+    wheel(x,y,r,color,hi,pos,1);
+    ctx.save();ctx.globalAlpha=.5;ctx.fillStyle=color;ctx.font="12.5px Menlo";
+    ctx.fillText(retro?"step 239, clock −1":"step 258",x,y-r-10);ctx.restore();
+  }
+  hop(brass,"#8c6a22","#674e12",26,58,true);
+  hop(green,"#2a745c","#134c3b",20,42,false);
+  $("#tyear").textContent=fmt(Math.round(t));
+  // note line
+  const n=$("#tlnote");
+  if(t<1071)n.innerHTML="the green wheel travels alone from 1071 BC, 258 at a hop";
+  else if(t<2026)n.innerHTML="two wheels from mirrored launches, 1071 BC and 1071 AD — the brass clock slips <em>one position back</em> per landing, reaching zero at 1788";
+  else if(t<2100)n.innerHTML="<em>2026, then 2027: the wheels pass one year apart and never touch.</em> the handover year between them is the season this whole model lives in";
+  else if(t<3939)n.innerHTML="first true meeting: the year <em>40,984</em>, after exactly <em>163</em> green hops — and 163 is a Heegner number";
+  else n.innerHTML="<em>3939: twelve hops of 239 complete one full backward lap — the clock is home</em>";
+}
+function loop(ts){
+  if(playing){const dt=Math.min(50,ts-last);t+=dt*(+$("#tspeed").value)**1.6*.02;
+    if(t>=Y1){t=Y1;playing=false;$("#tplay").textContent="play";}}
+  last=ts;
+  if(tlVisible)draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+$("#tplay").onclick=()=>{playing=!playing;$("#tplay").textContent=playing?"pause":"play";
+  if(t>=Y1){t=Y0;playing=true;$("#tplay").textContent="pause";}};
+$("#trew").onclick=()=>{t=Y0;draw();};
+cv.addEventListener("pointermove",e=>{if(e.buttons||e.type==="click"){
+  const rect=cv.getBoundingClientRect();
+  t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
+  t=Math.max(Y0,Math.min(Y1,t));}});
+cv.addEventListener("click",e=>{const rect=cv.getBoundingClientRect();
+  t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
+  t=Math.max(Y0,Math.min(Y1,t));});
+window.tlSeek=y=>{t=Math.max(Y0,Math.min(Y1,y));tlVisible=true;draw();};
+draw();
+})();
+
+/* ---- MACHINE STRIPS ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",RED="#ad4732",DIM="#655d4a",SKY="#35648c";
+const ease=u=>u<0?0:u>1?1:u*u*(3-2*u);
+function lbl(ctx,txt,x,y,c,sz,align){ctx.fillStyle=c;ctx.font=(sz||13)+"px Menlo";
+  ctx.textAlign=align||"center";ctx.fillText(txt,x,y);ctx.textAlign="center";}
+function road(ctx,W,y){ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(24,y);ctx.lineTo(W-24,y);ctx.stroke();}
+function mapper(W,a,b){return y=>24+(y-a)/(b-a)*(W-48);}
+function wheelM(ctx,x,y,r,c,pos){ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.4;ctx.stroke();
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(x+(r-5)*Math.cos(a),y+(r-5)*Math.sin(a),i===pos?3.4:1.5,0,7);
+    ctx.fillStyle=c;ctx.fill();}}
+function arch(ctx,x0,x1,y,h,c,w){ctx.strokeStyle=c;ctx.lineWidth=w||1.6;
+  ctx.beginPath();ctx.moveTo(x0,y);ctx.quadraticCurveTo((x0+x1)/2,y-h,x1,y);ctx.stroke();}
+function mk(id,dur,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let t0=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      if(t0===null)t0=ts;
+      const t=((ts-t0)/1000)%dur,W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,t);}
+    requestAnimationFrame(loop);})(0);
+}
+const LB=[1071,1310,1549,1788,2027],PB=[3,2,1,0,11];
+const LG=[];for(let y=-1070;y<=2026;y+=258)LG.push(y);
+
+/* I: 12 blocks of 79 + the 8 sliver */
+mk("m1",9,(ctx,W,H,t)=>{
+  const X=mapper(W,1040,2100),base=H-42;road(ctx,W,base);
+  lbl(ctx,"1071",X(1071),base+22,DIM);lbl(ctx,"2027",X(2027),base+22,DIM);
+  for(let i=0;i<12;i++){const u=ease((t-.35*i)/.5);if(u<=0)continue;
+    const a=1071+79*i;ctx.fillStyle="rgba(140,106,34,"+(.25+.06*(i%2))+")";
+    ctx.fillRect(X(a),base-20,(X(a+79)-X(a))*u,20);
+    ctx.strokeStyle="rgba(140,106,34,.5)";ctx.strokeRect(X(a),base-20,(X(a+79)-X(a))*u,20);}
+  if(t>.35*11+.6){const bl=.5+.5*Math.sin(t*5);
+    ctx.fillStyle="rgba(173,71,50,"+(.3+.5*bl)+")";
+    ctx.fillRect(X(2019),base-20,X(2027)-X(2019),20);
+    lbl(ctx,"12 × 79 = 948",X(1540),base-40,BRH,15);
+    lbl(ctx,"+ 8 left over",X(2010),base-40,RED,15);}
+});
+
+/* II: retrograde hops */
+mk("m2",10,(ctx,W,H,t)=>{
+  const X=mapper(W,1000,2110),base=H-46;road(ctx,W,base);
+  const k=Math.min(4,Math.floor(t/1.7)),f=Math.min(1,(t-1.7*k)/1.4);
+  LB.forEach((y,i)=>{const on=i<k||(i===k&&f<.02)||i<=k&&t>1.7*i;
+    ctx.beginPath();ctx.arc(X(y),base,i<=k?3.5:2,0,7);
+    ctx.fillStyle=i<=k?BR:"rgba(101,93,74,.35)";ctx.fill();
+    if(i<=k){lbl(ctx,y,X(y),base+20,BR,12);lbl(ctx,"pos "+PB[i],X(y),base+34,BRH,11);}});
+  let x,pos;
+  if(k>=4&&f>=1){x=X(2027);pos=11;lbl(ctx,"four hops, four slips back",W/2,26,BRH,14);}
+  else{const a=LB[k],b=LB[Math.min(k+1,4)];const u=ease(f);
+    x=X(a)+(X(b)-X(a))*u;pos=u>.96?PB[Math.min(k+1,4)]:PB[k];}
+  wheelM(ctx,x,base-24-Math.sin(Math.min(1,f)*Math.PI)*26,20,BR,pos);
+});
+
+/* III: 240 vs 239 race */
+mk("m3",10,(ctx,W,H,t)=>{
+  const X=mapper(W,1000,2160),y1=H*.3,y2=H*.76;
+  road(ctx,W,y1);road(ctx,W,y2);
+  lbl(ctx,"hops of 240 — always home",150,y1-26,DIM,12,"left");
+  lbl(ctx,"my 239 — slips",150,y2-26,DIM,12,"left");
+  const A=[1071,1311,1551,1791,2031],B=LB;
+  const k=Math.min(4,Math.floor(t/1.5)),f=Math.min(1,(t-1.5*k)/1.2),u=ease(f);
+  function run(list,y,c,posf){
+    list.forEach((yy,i)=>{if(i<=k){ctx.beginPath();ctx.arc(X(yy),y,3,0,7);ctx.fillStyle=c;ctx.fill();
+      lbl(ctx,yy,X(yy),y+18,c,11);}});
+    let x;if(k>=4&&f>=1)x=X(list[4]);
+    else x=X(list[k])+(X(list[Math.min(k+1,4)])-X(list[k]))*u;
+    wheelM(ctx,x,y-16,13,c,posf(Math.min(k+(f>.96?1:0),4)));}
+  run(A,y1,DIM,()=>3);run(B,y2,BR,i=>PB[i]);
+  if(k>=4&&f>=1){ctx.strokeStyle=RED;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(X(2027),y2-34);ctx.lineTo(X(2031),y1+8);ctx.stroke();ctx.setLineDash([]);
+    lbl(ctx,"4 years short, 4 positions back",X(2029)-20,H/2,RED,13,"right");}
+});
+
+/* IV: atoms — split the green hop, the brass refuses */
+mk("m4",11,(ctx,W,H,t)=>{
+  const X=mapper(W,950,1370),yG=H*.36,yB=H*.82;
+  road(ctx,W,yG);road(ctx,W,yB);
+  lbl(ctx,"one green hop: 994 → 1252",X(1123),yG+20,GR,12);
+  const jit=(t>7&&t<8.2)?Math.sin(t*45)*2.5:0;
+  lbl(ctx,"one brass hop: 1071 → 1310",X(1190)+jit,yB+20,BR,12);
+  if(t<2.5)arch(ctx,X(994),X(1252),yG,44,GR,2);
+  else if(t<5){for(let i=0;i<2;i++)arch(ctx,X(994+129*i),X(994+129*(i+1)),yG,30,GR,1.8);
+    lbl(ctx,"2 × 129",X(1123),yG-44,GR,13);}
+  else{for(let i=0;i<6;i++)arch(ctx,X(994+43*i),X(994+43*(i+1)),yG,18,GR,1.6);
+    lbl(ctx,"2 × 3 × 43 — all the way to atoms",X(1123),yG-34,GR,13);}
+  arch(ctx,X(1071)+jit,X(1310)+jit,yB,44,BR,2);
+  if(t>7)lbl(ctx,"239 — cannot split. an atom.",X(1190),yB-52,RED,13);
+});
+
+/* V: 3096 vs 3097, the clock swap */
+mk("m5",13,(ctx,W,H,t)=>{
+  const X=mapper(W,-1180,2170),base=H*.62;road(ctx,W,base);
+  lbl(ctx,"1071 BC",X(-1070),base+22,GR,12);
+  const end=t<4?2026:t<5.2?2026+ease((t-4)/1.2):2027;
+  lbl(ctx,Math.round(end),X(end),base+22,end>2026.5?RED:GR,12);
+  ctx.beginPath();ctx.arc(X(end),base,3.5,0,7);ctx.fillStyle=end>2026.5?RED:GR;ctx.fill();
+  if(t<5.2){const n=Math.min(12,Math.floor(t/.3));
+    for(let i=0;i<n;i++)arch(ctx,X(-1070+258*i),X(-1070+258*(i+1)),base,26,GR,1.6);
+    if(n>=12)lbl(ctx,"12 × 258 = 3096 — the 12 clock fits",W/2,24,GR,14);}
+  else if(t<6.8){for(let i=0;i<12;i++)arch(ctx,X(-1070+258*i),X(-1070+258*(i+1)),base,26,RED,1.2);
+    lbl(ctx,"+1 year: the 12 clock no longer fits",W/2,24,RED,14);}
+  else{const n=Math.min(19,Math.floor((t-6.8)/.22));
+    for(let i=0;i<n;i++)arch(ctx,X(-1070+163*i),X(-1070+163*(i+1)),base,20,SKY,1.5);
+    if(n>=19)lbl(ctx,"19 × 163 = 3097 — the 19 clock takes over",W/2,24,SKY,14);}
+});
+
+/* VI: fold each road onto its centre */
+mk("m6",9,(ctx,W,H,t)=>{
+  const X=mapper(W,-1180,2170),yA=H*.32,yB=H*.78;
+  road(ctx,W,yA);road(ctx,W,yB);
+  LG.forEach(y=>{ctx.beginPath();ctx.arc(X(y),yA,2,0,7);ctx.fillStyle="rgba(42,116,92,.5)";ctx.fill();});
+  LB.forEach(y=>{ctx.beginPath();ctx.arc(X(y),yB,2,0,7);ctx.fillStyle="rgba(140,106,34,.5)";ctx.fill();});
+  lbl(ctx,"green road: 1071 BC → 2026",170,yA-24,GR,12,"left");
+  lbl(ctx,"brass road: 1071 → 2027",170,yB-24,BR,12,"left");
+  const u=ease(t/3.2);
+  function fold(a,b,y,c,mid){
+    const xa=X(a)+(X(mid)-X(a))*u,xb=X(b)-(X(b)-X(mid))*u;
+    [xa,xb].forEach(x=>{ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();});
+    if(u>=1){const bl=.5+.5*Math.sin(t*5);ctx.beginPath();ctx.arc(X(mid),y,7+3*bl,0,7);
+      ctx.strokeStyle=c;ctx.stroke();lbl(ctx,mid+" — its own landing",X(mid),y-18,c,13);}}
+  fold(-1070,2026,yA,GR,478);fold(1071,2027,yB,BR,1549);
+});
+
+/* VII: 496 rebuilt from its parts */
+mk("m7",10,(ctx,W,H,t)=>{
+  const parts=[248,124,62,31,16,8,4,2,1],base=H*.6,x0=40,w=W-80;
+  ctx.strokeStyle="rgba(140,106,34,.5)";ctx.strokeRect(x0,base-24,w,24);
+  lbl(ctx,"a 496 year stretch of road",x0,base-38,DIM,12,"left");
+  let acc=0;
+  parts.forEach((b,i)=>{const u=ease((t-.7*i)/.5);
+    if(u>0){const bw=b/496*w*u;
+      ctx.fillStyle=i%2?"rgba(140,106,34,.55)":"rgba(103,78,18,.55)";
+      ctx.fillRect(x0+acc/496*w,base-24,bw,24);
+      if(b>=16)lbl(ctx,b,x0+(acc+b/2)/496*w,base-8,"#f7f2e4",12);}
+    acc+=b;});
+  if(t>.7*8+.7)lbl(ctx,"1 + 2 + 4 + 8 + 16 + 31 + 62 + 124 + 248 = 496, exactly itself",W/2,base+34,GR,14);
+});
+
+/* VIII: pass at one year, meet at 40984 */
+mk("m8",12,(ctx,W,H,t)=>{
+  const base=H*.62;
+  if(t<5){const X=mapper(W,1975,2075);road(ctx,W,base);
+    [2026,2027].forEach((y,i)=>{ctx.beginPath();ctx.arc(X(y),base,3.5,0,7);
+      ctx.fillStyle=i?BR:GR;ctx.fill();lbl(ctx,y,X(y),base+22,i?BR:GR,13);});
+    const u=ease(t/2.4);
+    wheelM(ctx,X(1980)+(X(2026)-X(1980))*u,base-22,16,GR,10);
+    wheelM(ctx,X(1984)+(X(2027)-X(1984))*Math.min(1,u*1.02),base-52,16,BR,11);
+    if(u>=1)lbl(ctx,"one year apart. they never touch.",W/2,26,BRH,14);}
+  else{const u=ease((t-5)/4.5),yr=Math.round(2027+(40984-2027)*u);
+    const X=mapper(W,2000,41200);road(ctx,W,base);
+    lbl(ctx,yr.toLocaleString(),W/2,40,BRH,26);
+    wheelM(ctx,X(2026+(40984-2026)*u),base-16,11,GR,10);
+    wheelM(ctx,X(2027+(40984-2027)*u),base-40,11,BR,11);
+    if(u>=1){const bl=.5+.5*Math.sin(t*6);
+      ctx.beginPath();ctx.arc(X(40984),base-28,16+5*bl,0,7);ctx.strokeStyle=RED;ctx.stroke();
+      lbl(ctx,"40,984 — first true meeting, 163 green hops",W/2,H-14,RED,14);}}
+});
+
+/* IX: the pi sliver on the wheel */
+mk("m9",10,(ctx,W,H,t)=>{
+  const cx=Math.min(120,W*.18),cy=H*.55,r=Math.min(58,H*.38);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.strokeStyle="rgba(140,106,34,.45)";ctx.stroke();
+  const a45=-Math.PI/4,tilt=Math.atan(1/5);
+  ctx.strokeStyle=SKY;ctx.setLineDash([3,4]);
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a45),cy+r*Math.sin(a45));ctx.stroke();ctx.setLineDash([]);
+  lbl(ctx,"45°",cx+(r+16)*Math.cos(a45),cy+(r+16)*Math.sin(a45),SKY,12);
+  const k=Math.min(4,Math.floor(t/1.3)),f=Math.min(1,(t-1.3*k)/0.9);
+  const th=(k+(k<4?ease(f):0))*tilt* (k<4?1:1);
+  const ang=-(Math.min(4,k+(k<4?ease(f):0)))*tilt;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(ang),cy+r*Math.sin(ang));ctx.stroke();
+  lbl(ctx,"tilt "+Math.min(4,k+(f>=1?1:0))+" of 4",cx,cy+r+18,DIM,12);
+  if(k>=4){const bl=.5+.5*Math.sin(t*5);
+    ctx.fillStyle="rgba(173,71,50,"+(.4+.4*bl)+")";
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,a45,-4*tilt,true);ctx.closePath();ctx.fill();
+    // zoom inset
+    const zx=W*.62,zy=H*.5,zr=Math.min(70,H*.4);
+    ctx.strokeStyle="rgba(101,93,74,.4)";ctx.beginPath();ctx.arc(zx,zy,zr,0,7);ctx.stroke();
+    ctx.strokeStyle=SKY;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(zx-zr,zy+30);ctx.lineTo(zx+zr,zy+30);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="rgba(173,71,50,.55)";
+    ctx.beginPath();ctx.moveTo(zx-zr,zy+30);ctx.lineTo(zx+zr,zy+30);ctx.lineTo(zx+zr,zy-30);ctx.closePath();ctx.fill();
+    lbl(ctx,"the overshoot, magnified: arctan(1/239)",zx,zy+58,RED,13);
+    lbl(ctx,"my 239",zx,zy-44,BRH,14);}
+});
+})();
+
+
+/* ---- THE WATCH ---- */
+(()=>{
+const cv=document.getElementById("watchcv");if(!cv)return;
+const ctx=cv.getContext("2d");const sec=cv.closest("section");
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",DIM="#655d4a",RED="#ad4732",PAPER="#f7f2e4";
+const fmtW=y=>y<=0?(1-y)+" BC":""+Math.round(y);
+const LBw=[1071,1310,1549,1788,2027];
+const LGw=[];for(let y=-1070;y<=2026;y+=258)LGw.push(y);
+function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+window.addEventListener("resize",rs);rs();
+let T=-1150,wind=1,last=performance.now(),handPos=3,handA=3,gA=0,gAt=0,bA=0,bAt=0,floats=[];
+let crownBox=null;
+cv.addEventListener("click",e=>{
+  const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(crownBox&&x>crownBox[0]-8&&x<crownBox[0]+crownBox[2]+8&&y>crownBox[1]-8&&y<crownBox[1]+crownBox[3]+8){
+    wind=wind===1?4:1;
+    document.getElementById("watchcap").textContent=wind===4?"wound: the years run four times faster":"unwound: normal time";
+  }});
+function gear(x,y,r,color,ang,alpha,teethLabel){
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.rotate(ang);
+  ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,r*.55,0,7);ctx.lineWidth=.7;ctx.stroke();
+  for(let i=0;i<48;i++){const a=i/48*2*Math.PI;
+    ctx.beginPath();ctx.moveTo(r*Math.cos(a),r*Math.sin(a));
+    ctx.lineTo((r+7)*Math.cos(a),(r+7)*Math.sin(a));
+    ctx.lineWidth=i===0?2.6:1;ctx.globalAlpha=alpha*(i===0?1:.55);ctx.stroke();}
+  ctx.globalAlpha=alpha;
+  for(let k=0;k<4;k++){const a=k*Math.PI/2+Math.PI/4;
+    ctx.beginPath();ctx.moveTo(r*.15*Math.cos(a),r*.15*Math.sin(a));
+    ctx.lineTo(r*.52*Math.cos(a),r*.52*Math.sin(a));ctx.lineWidth=3;ctx.stroke();}
+  ctx.beginPath();ctx.arc(0,0,3,0,7);ctx.fillStyle=color;ctx.fill();
+  ctx.restore();
+  ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.font="13px Menlo";ctx.textAlign="center";
+  ctx.fillText(teethLabel,x,y+r+22);ctx.globalAlpha=1;
+}
+function loop(ts){
+  const dt=Math.min(.06,(ts-last)/1000);last=ts;
+  if(!sec.classList.contains("vis")){requestAnimationFrame(loop);return;}
+  const W=cv.clientWidth,H=cv.clientHeight,cx=W/2,cy=H/2+14,R=Math.min(W,H)/2-46;
+  const prev=T;T+=dt*66*wind;
+  if(T>2100){T=-1150;handPos=3;handA=3;gA=gAt=bA=bAt=0;floats=[];}
+  LBw.forEach((y,i)=>{if(prev<y&&T>=y){gAt+=2*Math.PI/48*3;handPos=PBw(i);
+    floats.push({t:fmtW(y)+" · pos "+PBw(i),x:cx-R*.34,y:cy+R*.28,age:0,c:BRH});}});
+  LGw.forEach(y=>{if(prev<y&&T>=y){bAt+=2*Math.PI/48*3;
+    floats.push({t:fmtW(y),x:cx+R*.36,y:cy+R*.26,age:0,c:GR});}});
+  function PBw(i){return ((3-i)%12+12)%12;}
+  gA+=(gAt-gA)*Math.min(1,dt*7);bA+=(bAt-bA)*Math.min(1,dt*7);
+  handA+=(handPos-handA-Math.round((handA-handPos)/12)*12)*Math.min(1,dt*6)*(0+1);
+  // simpler: ease handA toward handPos on shortest path
+  ctx.clearRect(0,0,W,H);
+  // case
+  ctx.beginPath();ctx.arc(cx,cy,R+16,0,7);ctx.strokeStyle="rgba(140,106,34,.75)";ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+8,0,7);ctx.lineWidth=1;ctx.stroke();
+  // guilloche
+  for(let r=R-6;r>40;r-=15){ctx.beginPath();ctx.arc(cx,cy,r,0,7);
+    ctx.strokeStyle="rgba(140,106,34,.08)";ctx.lineWidth=1;ctx.stroke();}
+  // crown
+  crownBox=[cx-11,cy-R-42,22,24];
+  ctx.fillStyle="rgba(140,106,34,.85)";
+  ctx.fillRect(crownBox[0],crownBox[1],crownBox[2],crownBox[3]);
+  for(let i=0;i<3;i++){ctx.strokeStyle=PAPER;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(crownBox[0]+5+i*6,crownBox[1]+3);ctx.lineTo(crownBox[0]+5+i*6,crownBox[1]+21);ctx.stroke();}
+  // chapter ring
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    const x=cx+(R-16)*Math.cos(a),y=cy+(R-16)*Math.sin(a);
+    ctx.fillStyle=i===handPos?BRH:"rgba(101,93,74,.6)";ctx.font=(i===handPos?"15px":"12px")+" Menlo";
+    ctx.textAlign="center";ctx.fillText(i,x,y+4);}
+  // balance wheel (the oscillator)
+  const bx=cx,by=cy-R*.42,br=R*.22,osc=.7*Math.sin(ts/1000*5);
+  ctx.save();ctx.translate(bx,by);ctx.rotate(osc);
+  ctx.beginPath();ctx.arc(0,0,br,0,7);ctx.strokeStyle=DIM;ctx.lineWidth=2.2;ctx.stroke();
+  for(let k=0;k<2;k++){const a=k*Math.PI;
+    ctx.beginPath();ctx.moveTo(br*.2*Math.cos(a),br*.2*Math.sin(a));
+    ctx.lineTo(br*Math.cos(a),br*Math.sin(a));ctx.lineWidth=2;ctx.stroke();}
+  ctx.restore();
+  for(let k=0;k<3;k++){ctx.beginPath();
+    ctx.arc(bx,by,4+k*4,k*2+osc,k*2+osc+4.5);ctx.strokeStyle="rgba(101,93,74,.5)";ctx.lineWidth=1;ctx.stroke();}
+  ctx.fillStyle=DIM;ctx.font="11px Menlo";ctx.textAlign="center";
+  ctx.fillText("the oscillator",bx,by-br-10);
+  // gears
+  const brassAlive=T>=1071;
+  gear(cx-R*.34,cy+R*.28,R*.3,BR,gA,brassAlive?1:.3,"239");
+  gear(cx+R*.36,cy+R*.26,R*.33,GR,-bA,1,"258");
+  if(!brassAlive){ctx.fillStyle="rgba(140,106,34,.7)";ctx.font="11px Menlo";
+    ctx.fillText("waits for 1071",cx-R*.34,cy+R*.28-R*.3-14);}
+  // retrograde hand
+  const ha=handA/12*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.6;
+  ctx.beginPath();ctx.moveTo(cx-18*Math.cos(ha),cy-18*Math.sin(ha));
+  ctx.lineTo(cx+(R-34)*Math.cos(ha),cy+(R-34)*Math.sin(ha));ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,4.5,0,7);ctx.fillStyle=BRH;ctx.fill();
+  // year aperture
+  const yw=112;
+  ctx.fillStyle="rgba(255,252,243,.92)";ctx.fillRect(cx-yw/2,cy+R*.62,yw,30);
+  ctx.strokeStyle="rgba(140,106,34,.6)";ctx.lineWidth=1;ctx.strokeRect(cx-yw/2,cy+R*.62,yw,30);
+  ctx.fillStyle=BRH;ctx.font="16px Menlo";ctx.fillText(fmtW(T),cx,cy+R*.62+21);
+  // floats
+  floats=floats.filter(f=>f.age<1.8);
+  floats.forEach(f=>{f.age+=dt;ctx.globalAlpha=Math.max(0,1-f.age/1.8);
+    ctx.fillStyle=f.c;ctx.font="13px Menlo";ctx.fillText(f.t,f.x,f.y-38-f.age*16);ctx.globalAlpha=1;});
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+
+
+/* ---- REFERENCE WATCHES ON THE MOVEMENTS ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",RED="#ad4732",DIMc="#655d4a";
+function lblw(ctx,t,x,y,c,sz){ctx.fillStyle=c;ctx.font=(sz||12)+"px Menlo";ctx.textAlign="center";ctx.fillText(t,x,y);}
+function mkW(id,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let last=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      const dt=last===null?0:Math.min(.06,(ts-last)/1000);last=ts;
+      const W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,dt,ts/1000);}
+    requestAnimationFrame(loop);})(0);
+}
+function drawWatch(ctx,W,H,tt,hl,handPos){
+  const cx=W/2,cy=H/2+5,R=Math.min(W,H)/2-24;
+  const on=k=>{
+    if(hl==="gears")return k==="brassgear"||k==="greengear";
+    return k===hl;};
+  const al=k=>{ctx.globalAlpha=on(k)?1:.15;};
+  // case + crown
+  al("case");
+  ctx.beginPath();ctx.arc(cx,cy,R+9,0,7);ctx.strokeStyle="rgba(140,106,34,.85)";ctx.lineWidth=2.2;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+3.5,0,7);ctx.lineWidth=.8;ctx.stroke();
+  ctx.fillStyle="rgba(140,106,34,.85)";ctx.fillRect(cx-5.5,cy-R-21,11,12);
+  // chapter ring
+  al("chapter");
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(cx+(R-8)*Math.cos(a),cy+(R-8)*Math.sin(a),on("chapter")?2.6:1.7,0,7);
+    ctx.fillStyle=on("chapter")?BRH:DIMc;ctx.fill();}
+  // balance
+  al("balance");
+  const bx=cx,by=cy-R*.42,br=R*.21,osc=.7*Math.sin(tt*5);
+  ctx.save();ctx.translate(bx,by);ctx.rotate(osc);
+  ctx.beginPath();ctx.arc(0,0,br,0,7);ctx.strokeStyle=DIMc;ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-br,0);ctx.lineTo(br,0);ctx.stroke();ctx.restore();
+  // gears
+  function gear(x,y,r,c,ang,k){al(k);ctx.save();ctx.translate(x,y);ctx.rotate(ang);
+    ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.3;ctx.stroke();
+    for(let i=0;i<22;i++){const a=i/22*2*Math.PI;
+      ctx.beginPath();ctx.moveTo(r*Math.cos(a),r*Math.sin(a));
+      ctx.lineTo((r+4.5)*Math.cos(a),(r+4.5)*Math.sin(a));ctx.lineWidth=i===0?2:.8;ctx.stroke();}
+    ctx.beginPath();ctx.arc(0,0,1.8,0,7);ctx.fillStyle=c;ctx.fill();ctx.restore();}
+  gear(cx-R*.33,cy+R*.3,R*.27,BR,tt*.5,"brassgear");
+  gear(cx+R*.36,cy+R*.28,R*.3,GR,-tt*.5*239/258,"greengear");
+  // hand
+  al("hand");
+  const ha=handPos/12*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.1;
+  ctx.beginPath();ctx.moveTo(cx-11*Math.cos(ha),cy-11*Math.sin(ha));
+  ctx.lineTo(cx+(R-18)*Math.cos(ha),cy+(R-18)*Math.sin(ha));ctx.stroke();
+  // axle
+  al("axle");
+  ctx.beginPath();ctx.arc(cx,cy,on("axle")?4.5:2.8,0,7);ctx.fillStyle=BRH;ctx.fill();
+  // aperture
+  al("aperture");
+  ctx.fillStyle="rgba(255,252,243,.95)";ctx.fillRect(cx-24,cy+R*.56,48,17);
+  ctx.strokeStyle="rgba(140,106,34,.7)";ctx.lineWidth=1;ctx.strokeRect(cx-24,cy+R*.56,48,17);
+  ctx.fillStyle=BRH;ctx.font="11px Menlo";ctx.textAlign="center";ctx.fillText("2027",cx,cy+R*.56+12.5);
+  // halo
+  ctx.globalAlpha=.5+.45*Math.sin(tt*4);
+  ctx.strokeStyle=RED;ctx.lineWidth=1.5;
+  let hx=cx,hy=cy,hr=R*.5;
+  if(hl==="balance"){hx=bx;hy=by;hr=br+8;}
+  else if(hl==="gears"){hy=cy+R*.29;hr=R*.6;}
+  else if(hl==="brassgear"){hx=cx-R*.33;hy=cy+R*.3;hr=R*.27+11;}
+  else if(hl==="greengear"){hx=cx+R*.36;hy=cy+R*.28;hr=R*.3+11;}
+  else if(hl==="aperture"){hy=cy+R*.56+8;hr=32;}
+  else if(hl==="axle"){hr=13;}
+  else if(hl==="case"){hr=R+15;}
+  else if(hl==="chapter"){hr=R-8;}
+  ctx.beginPath();ctx.arc(hx,hy,hr,0,7);ctx.stroke();
+  ctx.globalAlpha=1;
+}
+let pos=3,acc=0;
+const MAP={wm1:"chapter",wm2:"hand",wm3:"brassgear",wm4:"greengear",wm5:"aperture",
+           wm6:"axle",wm7:"case",wm8:"gears",wm9:"balance",
+           ew1:"gears",ew2:"balance",ew3:"hand",ew4:"aperture"};
+Object.entries(MAP).forEach(([id,key])=>{
+  mkW(id,(ctx,W,H,dt,tt)=>{
+    if(key==="hand"){acc+=dt;if(acc>1.2){acc=0;pos=((pos-1)%12+12)%12;}}
+    drawWatch(ctx,W,H,tt,key,key==="hand"?pos:3);
+  });
+});
+})();
+
+
+/* ---- THE SKY ENGINES ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",SKYC="#35648c",RED="#ad4732",DIM="#655d4a",DARK="#3a3426";
+const SYN=29.530588,TROP=365.2422;
+function mk(id,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let last=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      const dt=last===null?0:Math.min(.06,(ts-last)/1000);last=ts;
+      const W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,dt,ts/1000);}
+    requestAnimationFrame(loop);})(0);
+}
+function lbl(ctx,t,x,y,c,sz,al){ctx.fillStyle=c;ctx.font=(sz||13)+"px Menlo";
+  ctx.textAlign=al||"center";ctx.fillText(t,x,y);ctx.textAlign="center";}
+function drawMoon(ctx,x,y,r,p){
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle="#efe4c8";ctx.fill();
+  const waxing=p<.5,c=Math.cos(2*Math.PI*p);
+  ctx.beginPath();
+  ctx.arc(x,y,r,Math.PI/2,-Math.PI/2,!waxing);
+  ctx.ellipse(x,y,r*Math.abs(c),r,0,-Math.PI/2,Math.PI/2,waxing? c<0 : c>0);
+  ctx.fillStyle=DARK;ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle="rgba(101,93,74,.6)";ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();
+}
+/* Engine I: phase engine */
+(()=>{
+let days=0;
+mk("ec1",(ctx,W,H,dt)=>{
+  days+=dt*(+$("#esp1").value);
+  const p=(days%SYN)/SYN, yr=(days%TROP)/TROP;
+  const mx=W*.24,my=H/2,mr=Math.min(86,H*.3);
+  drawMoon(ctx,mx,my,mr,p);
+  const names=["new","waxing crescent","first quarter","waxing gibbous","full","waning gibbous","last quarter","waning crescent"];
+  lbl(ctx,names[Math.floor(((p+1/16)%1)*8)],mx,my+mr+26,DIM,13);
+  // dial
+  const dx=W*.66,dy=H/2,dr=Math.min(100,H*.36);
+  ctx.beginPath();ctx.arc(dx,dy,dr,0,7);ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(dx,dy,dr*.62,0,7);ctx.strokeStyle="rgba(42,116,92,.35)";ctx.stroke();
+  const sa=yr*2*Math.PI-Math.PI/2, ma=(days%SYN)/SYN*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BR;ctx.lineWidth=2.6;
+  ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx+dr*Math.cos(sa),dy+dr*Math.sin(sa));ctx.stroke();
+  ctx.strokeStyle=GR;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx+dr*.62*Math.cos(ma),dy+dr*.62*Math.sin(ma));ctx.stroke();
+  ctx.beginPath();ctx.arc(dx,dy,3.5,0,7);ctx.fillStyle=BRH;ctx.fill();
+  lbl(ctx,"sun / year",dx+dr+14,dy-6,BR,12,"left");
+  lbl(ctx,"moon / month",dx,dy+dr*.62+20,GR,12);
+  $("#er1").innerHTML="day <b>"+Math.floor(days%TROP)+"</b> of the year &#183; moon day <b>"+
+    Math.floor(days%SYN)+"</b> &#183; year <b>"+Math.floor(days/TROP)+"</b>";
+});
+})();
+
+/* Engine II: the nineteen */
+(()=>{
+let t19=0,running=0,cycles=0,drift=0,fast=false;
+$("#eb19").onclick=()=>{running=1;fast=false;};
+$("#eb163").onclick=()=>{running=1;fast=true;};
+mk("ec2",(ctx,W,H,dt)=>{
+  const cx=W*.38,cy=H/2,R=Math.min(105,H*.38);
+  if(running){t19+=dt*(fast?9:2.4);
+    if(t19>=19){t19=0;cycles++;drift+=0.0865;
+      if(!fast||cycles>=163){running=fast&&cycles<163?1:0;}
+      if(fast&&cycles>=163){running=0;}
+      if(!fast)running=0;}}
+  const yrs=t19, moons=t19/19*235;
+  ctx.beginPath();ctx.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+yrs/19*2*Math.PI);
+  ctx.strokeStyle=BR;ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R*.72,-Math.PI/2,-Math.PI/2+(moons%235)/235*2*Math.PI);
+  ctx.strokeStyle=GR;ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.strokeStyle="rgba(140,106,34,.18)";ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R*.72,0,7);ctx.strokeStyle="rgba(42,116,92,.16)";ctx.stroke();
+  lbl(ctx,Math.floor(yrs)+" / 19 years",cx,cy-8,BRH,15);
+  lbl(ctx,Math.floor(moons)+" / 235 moons",cx,cy+16,GR,15);
+  // drift gauge
+  const gx=W*.72,gw=W*.2,gy=H/2;
+  ctx.strokeStyle="rgba(101,93,74,.4)";ctx.strokeRect(gx,gy-12,gw,24);
+  ctx.fillStyle="rgba(173,71,50,.55)";ctx.fillRect(gx,gy-12,gw*Math.min(1,drift/14.1),24);
+  lbl(ctx,"the leak: "+drift.toFixed(2)+" days",gx+gw/2,gy-24,RED,13);
+  lbl(ctx,"cycles completed: "+cycles+(cycles>=163?"  — the eclipse":""),gx+gw/2,gy+34,DIM,13);
+  if(cycles>=163)$("#ecap2").innerHTML="<b>163 cycles, the ledger's count to the eclipse:</b> the rings closed together 163 times, and the leak grew to fourteen days. Exact in the numbers, loose in the moonlight.";
+});
+})();
+
+/* Engine III: saros chain */
+(()=>{
+const CH=[[1901,"18 May 1901"],[1919,"29 May 1919 — Eddington"],[1937,"8 Jun 1937"],[1955,"20 Jun 1955"],
+[1973,"30 Jun 1973"],[1991,"11 Jul 1991"],[2009,"22 Jul 2009"],[2027,"2 Aug 2027 — Luxor"]];
+mk("ec3",(ctx,W,H,dt,tt)=>{
+  const t=(tt%14);
+  const X=y=>40+(y-1894)/(2040-1894)*(W-80),base=H*.52;
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.beginPath();ctx.moveTo(30,base);ctx.lineTo(W-30,base);ctx.stroke();
+  const k=Math.min(7,Math.floor(t/1.5)),f=Math.min(1,(t-1.5*k)/1.1);
+  CH.forEach((c,i)=>{if(i<=k){
+    ctx.beginPath();ctx.arc(X(c[0]),base,i===1||i===7?4.5:3,0,7);
+    ctx.fillStyle=i===1||i===7?RED:BR;ctx.fill();
+    ctx.save();ctx.translate(X(c[0]),base+(i%2?24:-16));ctx.rotate(0);
+    lbl(ctx,c[1],0,0,i===1||i===7?RED:BRH,i===1||i===7?13:11);ctx.restore();}});
+  if(k<7){const a=CH[k][0],b=CH[Math.min(k+1,7)][0],u=f*f*(3-2*f);
+    const x=X(a)+(X(b)-X(a))*u;
+    drawMoon(ctx,x,base-46-Math.sin(f*Math.PI)*26,15,0); // new moon carries the shadow
+    lbl(ctx,"saros: +18y 11d",x,base-84,DIM,11);}
+  else{
+    // metonic sibling arc
+    ctx.strokeStyle=GR;ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.moveTo(X(2008),base+40);
+    ctx.quadraticCurveTo((X(2008)+X(2027))/2,base+86,X(2027),base+40);ctx.stroke();
+    ctx.beginPath();ctx.arc(X(2008),base+40,3.5,0,7);ctx.fillStyle=GR;ctx.fill();
+    ctx.beginPath();ctx.arc(X(2027),base+40,3.5,0,7);ctx.fill();
+    lbl(ctx,"1 Aug 2008",X(2008),base+62,GR,12);
+    lbl(ctx,"metonic sibling: +19 years, 1 day",(X(2008)+X(2027))/2,base+98,GR,13);}
+});
+})();
+
+/* The verdict */
+(()=>{
+mk("ec4",(ctx,W,H,dt,tt)=>{
+  const t=(tt%16);
+  const X=y=>30+(y+1070)/(2027+1070)*(W-60),base=H*.42;
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.beginPath();ctx.moveTo(24,base);ctx.lineTo(W-24,base);ctx.stroke();
+  lbl(ctx,"1071 BC",X(-1070),base+20,DIM,12);lbl(ctx,"2027",X(2027),base+20,DIM,12);
+  const prog=Math.min(1,t/10);
+  const n=Math.floor(prog*163);
+  for(let i=0;i<=n;i++){const y=-1070+19*i;
+    ctx.fillStyle=i%2?"rgba(53,100,140,.5)":"rgba(53,100,140,.8)";
+    ctx.fillRect(X(y),base-8,1,8);}
+  lbl(ctx,n+" of 163 metonic ticks",W/2,base-26,SKYC,14);
+  // green wheel hops beneath
+  for(let i=0;i<13;i++){const y=-1070+258*i;
+    if(prog*3097>=(258*i)){ctx.beginPath();ctx.arc(X(y),base+34,3,0,7);ctx.fillStyle=GR;ctx.fill();}}
+  lbl(ctx,"my green wheel, 12 hops of 258",W/2,base+58,GR,12);
+  // drift gauge
+  const gw=W*.5,gx=W/2-gw/2,gy=H-46;
+  ctx.strokeStyle="rgba(101,93,74,.4)";ctx.strokeRect(gx,gy-10,gw,20);
+  ctx.fillStyle="rgba(173,71,50,.55)";ctx.fillRect(gx,gy-10,gw*prog,20);
+  lbl(ctx,"the sky's leak: "+(prog*14.1).toFixed(1)+" of 14.1 days",W/2,gy-20,RED,13);
+  if(prog>=1){drawMoon(ctx,X(2027),base-38,13,0);
+    lbl(ctx,"the shadow arrives",X(2027),base-64,BRH,12);}
+});
+})();
+
+
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,1638 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kad&#305;k&ouml;y'den Mektuplar - 1</title>
+<style>
+:root{
+  --ink:#f7f2e4; --ink2:#efe7d3; --plate:#f2ecdc;
+  --brass:#8c6a22; --brass-hi:#674e12; --brass-dim:rgba(140,106,34,.28);
+  --verdi:#2a745c; --sky:#35648c; --madder:#ad4732;
+  --text:#211d12; --text-dim:#655d4a;
+  --hairline:rgba(140,106,34,.22);
+  --serif:"Didot","Bodoni 72","Baskerville","Hoefler Text",Georgia,serif;
+  --mono:"SF Mono","Menlo","Courier New",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--ink); color:var(--text);
+  font-family:var(--serif); overflow-x:hidden;
+}
+body::after{ /* grain */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:99; opacity:.035;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+::selection{background:var(--brass);color:var(--ink)}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--ink)}
+::-webkit-scrollbar-thumb{background:var(--brass-dim);border-radius:5px}
+
+section{
+  min-height:100vh; position:relative; padding:8vh 7vw;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  border-top:1px solid var(--hairline);
+}
+.plate{max-width:1060px;width:100%}
+.movnum{
+  font-family:var(--mono); font-size:.85rem; letter-spacing:.45em; color:var(--brass);
+  text-transform:uppercase; margin-bottom:1.1rem; opacity:0; transform:translateY(14px);
+  transition:all .8s ease .1s;
+}
+h2{
+  font-size:clamp(1.9rem,4.2vw,3.1rem); font-weight:400; letter-spacing:.01em;
+  margin-bottom:.7rem; opacity:0; transform:translateY(14px); transition:all .8s ease .22s;
+}
+.lede{
+  color:var(--text-dim); font-size:clamp(1.15rem,1.8vw,1.4rem); line-height:1.7;
+  max-width:640px; margin-bottom:2.6rem; opacity:0; transform:translateY(14px);
+  transition:all .8s ease .34s;
+}
+section.vis .movnum, section.vis h2, section.vis .lede{opacity:1;transform:none}
+.stage{
+  opacity:0; transition:opacity 1s ease .5s;
+}
+section.vis .stage{opacity:1}
+em{color:var(--brass-hi);font-style:normal}
+.num{font-family:var(--mono)}
+
+/* nav dots */
+#nav{position:fixed;right:1.4rem;top:50%;transform:translateY(-50%);z-index:50;display:flex;flex-direction:column;gap:.65rem}
+#nav a{width:7px;height:7px;border-radius:50%;background:var(--brass-dim);display:block;transition:all .3s}
+#nav a.on{background:var(--brass);box-shadow:0 0 8px var(--brass)}
+
+/* controls */
+.ctl{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:1.6rem}
+button{
+  font-family:var(--mono);font-size:.92rem;letter-spacing:.12em;color:var(--brass);
+  background:transparent;border:1px solid var(--brass-dim);padding:.55em 1.2em;cursor:pointer;
+  border-radius:2px;transition:all .25s;text-transform:uppercase;
+}
+button:hover{border-color:var(--brass);background:rgba(140,106,34,.08)}
+button.hot{background:var(--brass);color:var(--ink);border-color:var(--brass)}
+button:disabled{opacity:.35;cursor:default}
+input[type=range]{
+  -webkit-appearance:none;width:200px;height:2px;background:var(--brass-dim);outline:none;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:15px;height:15px;border-radius:50%;background:var(--brass);
+  cursor:pointer;box-shadow:0 0 8px rgba(140,106,34,.6);
+}
+.readout{font-family:var(--mono);font-size:1.02rem;color:var(--text-dim)}
+.readout b{color:var(--brass-hi);font-weight:400}
+
+/* I leftovers */
+#baskets{display:flex;gap:6px;align-items:flex-end;justify-content:center;height:230px;margin-top:1rem}
+.basket{width:26px;background:linear-gradient(180deg,rgba(140,106,34,.55),rgba(140,106,34,.18));
+  border:1px solid var(--brass-dim);border-bottom-width:3px;transition:height .5s cubic-bezier(.5,1.6,.4,1);position:relative}
+.basket span{position:absolute;bottom:-1.6rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.6rem;color:var(--text-dim)}
+#crumbs{display:flex;gap:9px;justify-content:center;margin-top:3rem;min-height:26px;flex-wrap:wrap}
+.crumb{width:13px;height:13px;border-radius:50%;background:var(--madder);
+  box-shadow:0 0 10px rgba(173,71,50,.8);animation:crumb .5s cubic-bezier(.5,1.8,.4,1) backwards}
+@keyframes crumb{from{transform:scale(0) translateY(-30px)}}
+#eq1{text-align:center;font-size:1.55rem;margin-top:1.4rem;font-family:var(--mono)}
+#eq1 .r{color:var(--madder)}
+#eq1 .clean{color:var(--verdi)}
+
+/* II clock */
+.clockwrap{display:flex;gap:4vw;align-items:center;justify-content:center;flex-wrap:wrap}
+#trail{font-family:var(--mono);font-size:1.08rem;line-height:2.2;color:var(--text-dim);min-width:210px;max-width:260px}
+#trail em{font-size:1.05rem}
+
+/* IV atoms */
+#bubbles{display:flex;gap:14px;justify-content:center;align-items:center;flex-wrap:wrap;min-height:130px;margin-top:1rem}
+.bub{border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);
+  border:1px solid var(--brass);color:var(--brass-hi);background:radial-gradient(circle at 35% 30%,rgba(140,106,34,.28),rgba(140,106,34,.05));
+  animation:pop .5s cubic-bezier(.5,1.8,.4,1) backwards}
+@keyframes pop{from{transform:scale(0)}}
+.bub.prime-solo{border-color:var(--brass-hi);box-shadow:0 0 26px rgba(103,78,18,.35)}
+.chips{display:flex;gap:.6rem;flex-wrap:wrap;justify-content:center;margin-top:1.2rem}
+.atomin{font-family:var(--mono);background:transparent;border:1px solid var(--brass-dim);color:var(--text);
+  padding:.5em .8em;width:150px;font-size:1.1rem;border-radius:2px;text-align:center}
+
+/* V neighbours */
+#nbr{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;margin-top:1rem}
+.card{border:1px solid var(--hairline);padding:1.4rem 1.6rem;min-width:215px;text-align:center;background:rgba(255,252,243,.75);transition:all .4s}
+.card.mid{border-color:var(--brass);box-shadow:0 0 34px rgba(140,106,34,.12)}
+.card h3{font-family:var(--mono);font-weight:400;font-size:1.95rem;margin-bottom:.7rem}
+.card .fac{font-family:var(--mono);font-size:1.08rem;color:var(--sky);min-height:2.4em}
+.card .badge{display:inline-block;margin-top:.8rem;font-family:var(--mono);font-size:.8rem;letter-spacing:.15em;
+  padding:.35em .8em;border:1px solid var(--hairline);border-radius:2px;color:var(--text-dim)}
+.card .badge.yes{color:var(--verdi);border-color:var(--verdi)}
+.card .badge.no{color:var(--madder);border-color:rgba(173,71,50,.5)}
+
+/* VI mirror */
+#mirror{width:100%;max-width:900px;margin:0 auto}
+.mline{display:flex;gap:2rem;justify-content:center;margin-top:1rem;font-family:var(--mono);font-size:1.05rem;flex-wrap:wrap}
+.mline b{font-weight:400}
+.mA{color:var(--brass-hi)} .mB{color:var(--sky)}
+
+/* VII perfect */
+#towerwrap{display:flex;gap:5vw;align-items:flex-end;justify-content:center;height:300px;margin-top:1rem}
+#tower{display:flex;flex-direction:column-reverse;width:120px;border-bottom:2px solid var(--brass)}
+#tower div{border:1px solid rgba(247,242,228,.9);background:linear-gradient(90deg,var(--brass),#75581c);
+  font-family:var(--mono);font-size:.62rem;color:var(--ink);display:flex;align-items:center;justify-content:center;
+  transition:height .6s ease;overflow:hidden;animation:pop .45s backwards}
+#target{width:120px;position:relative;border-bottom:2px solid var(--hairline)}
+#target .fill{position:absolute;bottom:0;width:100%;background:repeating-linear-gradient(45deg,rgba(42,116,92,.25) 0 8px,rgba(42,116,92,.1) 8px 16px);border:1px dashed var(--verdi)}
+#target span,#tower>span{position:absolute;top:-1.7rem;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:.75rem;color:var(--text-dim);white-space:nowrap}
+#verdict{text-align:center;font-family:var(--mono);margin-top:1.3rem;font-size:1.15rem;min-height:1.4em}
+
+/* VIII gears */
+.gearwrap{display:flex;gap:3vw;align-items:center;justify-content:center;flex-wrap:wrap}
+#gmeta{font-family:var(--mono);font-size:1.08rem;line-height:2;color:var(--text-dim);min-width:230px}
+#gmeta em{font-size:1.1rem}
+
+/* IX sliver */
+.slwrap{display:flex;gap:3vw;align-items:center;justify-content:center;flex-wrap:wrap}
+
+/* X finale */
+#finale{padding:6vh 0}
+#finale .plate{max-width:none;width:100%}
+#tl{display:block;width:100%;height:430px;cursor:crosshair}
+#tlctl{padding:0 7vw}
+#tlnote{font-family:var(--mono);text-align:center;color:var(--text-dim);font-size:1.05rem;margin-top:.8rem;min-height:1.3em}
+#tlnote em{color:var(--brass-hi)}
+
+/* the coincidence */
+.pt-heart{--acc:#8c6a22;background:#f6eedb}
+.coin{font-family:var(--mono);max-width:740px;margin:0 auto 1.5rem;font-size:1.05rem;line-height:1.7;
+  color:var(--text-dim);display:flex;gap:1.3rem;align-items:baseline;text-align:left}
+.coin b{font-size:2rem;color:var(--brass-hi);font-weight:400;flex:none;min-width:3.2em;text-align:right}
+
+/* part color codes: the background IS the code */
+.pt-case{--acc:#8c6a22;background:#f4ecd4}
+.pt-engines{--acc:#35648c;background:#e9eff5}
+.pt-move{--acc:#2a745c;background:#e8f1ea}
+.pt-machine{--acc:#7d3f2a;background:#f6e9e0}
+.pt-land{--acc:#7a5a86;background:#f0e9f2}
+.pt-vow{--acc:#ad4732;background:#f8e8e1}
+section[class*="pt-"] .movnum{color:var(--acc)}
+section[class*="pt-"] h2{color:color-mix(in srgb,var(--acc) 55%, var(--text))}
+canvas.sky{width:100%;display:block;border-top:1px solid var(--hairline);
+  border-bottom:1px solid var(--hairline);background:rgba(255,252,243,.5)}
+.cap{font-family:var(--mono);font-size:1rem;color:var(--text-dim);margin-top:.7rem;text-align:center}
+.cap b{color:var(--brass-hi);font-weight:400}
+
+/* reference watches */
+.watchref{display:flex;gap:1.6rem;align-items:center;justify-content:center;margin:0 auto 2.2rem;max-width:760px;flex-wrap:wrap}
+.watchref canvas{width:200px;height:200px;flex:none}
+.wrcap{font-family:var(--mono);font-size:.95rem;line-height:1.6;color:var(--text-dim);max-width:420px;text-align:left}
+.wrcap b{color:var(--brass-hi);font-weight:400}
+
+/* the vow */
+#vow .plate{max-width:780px;text-align:center}
+#vow .vowframe{font-family:var(--mono);font-size:.95rem;letter-spacing:.14em;color:var(--text-dim);
+  text-transform:uppercase;margin-bottom:2.4rem;opacity:0;transition:all .8s ease .1s}
+#vow p{font-size:clamp(1.2rem,1.8vw,1.45rem);line-height:1.9;margin-bottom:1.8rem;color:var(--text);
+  opacity:0;transform:translateY(14px);transition:all .9s ease}
+section.vis#vow p,section.vis#vow .vowframe{opacity:1;transform:none}
+#vow p em{color:var(--brass-hi)}
+.cartouche{display:inline-block;border:1.5px solid var(--brass);border-radius:2em;
+  padding:.05em .65em .1em;position:relative;color:var(--brass-hi);white-space:nowrap}
+.cartouche::after{content:"";position:absolute;right:-7px;top:15%;height:70%;width:2.5px;background:var(--brass)}
+#vow .vowsig{font-family:var(--mono);font-size:.95rem;letter-spacing:.3em;color:var(--brass);
+  text-transform:uppercase;margin-top:2.2rem;opacity:0;transition:all .9s ease 1.2s}
+section.vis#vow .vowsig{opacity:1}
+
+/* the watch */
+#watchcv{width:min(640px,92vw);height:580px;display:block;margin:0 auto;cursor:pointer}
+#watchcap{font-family:var(--mono);font-size:1rem;color:var(--text-dim);text-align:center;margin-top:.4rem;min-height:1.4em}
+
+/* machine strips */
+.mstrip{max-width:880px;margin:-1rem auto 2.4rem;opacity:0;transform:translateY(12px);transition:all .9s ease .4s}
+section.vis .mstrip{opacity:1;transform:none}
+canvas.mini{width:100%;height:170px;display:block;border-top:1px solid var(--hairline);border-bottom:1px solid var(--hairline);background:rgba(255,252,243,.5)}
+.mscap{font-family:var(--mono);font-size:.98rem;color:var(--text-dim);margin-top:.6rem;text-align:center}
+.mscap b{color:var(--brass-hi);font-weight:400}
+
+/* wheel anchor notes */
+.wheelnote{display:flex;align-items:center;gap:1rem;max-width:640px;margin:-1.4rem 0 2rem;
+  padding:.8rem 1.1rem;border-left:2px solid var(--brass-dim);background:rgba(140,106,34,.06);
+  opacity:0;transform:translateY(12px);transition:all .8s ease .45s}
+section.vis .wheelnote{opacity:1;transform:none}
+.wheelnote span{font-size:1.02rem;line-height:1.6;color:var(--text-dim)}
+.wheelnote b{color:var(--text);font-weight:400}
+
+/* intro */
+#intro .plate{max-width:760px}
+#intro p{font-size:clamp(1.15rem,1.7vw,1.35rem);line-height:1.85;margin-bottom:1.5rem;color:var(--text);
+  opacity:0;transform:translateY(14px);transition:all .8s ease}
+section.vis#intro p{opacity:1;transform:none}
+#intro p em{color:var(--brass-hi)}
+#intro .sig2{font-family:var(--mono);font-size:.9rem;letter-spacing:.25em;color:var(--brass);text-transform:uppercase;
+  margin-top:1rem;opacity:0;transition:all .8s ease 1s}
+section.vis#intro .sig2{opacity:1}
+
+/* touchdown register */
+#reg .plate{max-width:980px}
+.tdrows{position:relative;margin-top:1rem}
+.tdrows::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--hairline)}
+.td{display:grid;grid-template-columns:1fr 40px 1fr;align-items:start;margin-bottom:1.5rem;
+  opacity:0;transform:translateY(16px);transition:all .7s ease;cursor:pointer}
+section.vis .td{opacity:1;transform:none}
+.td .cell{padding:0 .4rem}
+.td .l{text-align:right}
+.td .r{text-align:left}
+.td .node{width:12px;height:12px;border-radius:50%;margin:6px auto 0;border:1px solid;transition:all .3s}
+.td.g .node{border-color:var(--verdi);background:rgba(42,116,92,.25)}
+.td.b .node{border-color:var(--brass);background:rgba(140,106,34,.25)}
+.td:hover .node{box-shadow:0 0 12px currentColor}
+.td.g:hover .node{background:var(--verdi)}
+.td.b:hover .node{background:var(--brass)}
+.td .yr{font-family:var(--mono);font-size:1.3rem;letter-spacing:.05em}
+.td.g .yr{color:var(--verdi)}
+.td.b .yr{color:var(--brass-hi)}
+.td .ttl{font-size:1.25rem;color:var(--text);margin:.15rem 0 .3rem}
+.td .sum{font-size:1.05rem;line-height:1.6;color:var(--text-dim);max-width:440px;display:inline-block}
+.td .exact{font-family:var(--mono);font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;
+  border:1px solid var(--hairline);border-radius:2px;padding:.2em .6em;color:var(--text-dim)}
+.td.g .exact.on{color:var(--verdi);border-color:var(--verdi)}
+.td.b .exact.on{color:var(--brass);border-color:var(--brass)}
+.reghead{display:flex;justify-content:space-between;max-width:980px;margin:0 auto 1.6rem;font-family:var(--mono);
+  font-size:.85rem;letter-spacing:.3em;text-transform:uppercase}
+.reghead .gh{color:var(--verdi)} .reghead .bh{color:var(--brass)}
+
+/* title + end */
+#title{border-top:none;text-align:center}
+#title .series{color:var(--text-dim);font-size:clamp(1.1rem,1.8vw,1.4rem);letter-spacing:.16em;margin-bottom:2.2rem;opacity:0;animation:rise 1.4s ease .1s forwards}
+#title h1{font-size:clamp(2.6rem,7vw,5.4rem);font-weight:400;letter-spacing:.02em;line-height:1.12;
+  opacity:0;animation:rise 1.4s ease .3s forwards}
+#title .sub{color:var(--text-dim);margin-top:1.4rem;font-size:1.3rem;letter-spacing:.04em;opacity:0;animation:rise 1.4s ease .8s forwards}
+#title .hint{position:absolute;bottom:4vh;font-family:var(--mono);font-size:.7rem;letter-spacing:.4em;color:var(--brass);
+  text-transform:uppercase;opacity:0;animation:rise 1.4s ease 1.6s forwards}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+#titleclock{margin:0 auto 2.4rem;display:block;opacity:0;animation:rise 1.6s ease .1s forwards}
+#end{text-align:center}
+#end p{font-size:clamp(1.3rem,2.6vw,2rem);max-width:720px;line-height:1.6;color:var(--text)}
+#end .sig{margin-top:2.4rem;font-family:var(--mono);font-size:.75rem;letter-spacing:.35em;color:var(--brass);text-transform:uppercase}
+small.note{display:block;margin-top:1.2rem;color:var(--text-dim);font-size:.95rem;font-family:var(--mono)}
+
+/* levha */
+.rlens{max-width:760px;margin:2.4rem 0 0;opacity:0;transform:translateY(12px);transition:all .9s ease .55s}
+section.vis .rlens{opacity:1;transform:none}
+.rlens .lens{font-size:1.12rem;font-style:italic;color:var(--brass-hi);margin-bottom:.9rem}
+.pane{border:1.5px solid var(--acc,var(--brass));padding:1.4rem 1.5rem 1.1rem;position:relative;
+  background:rgba(255,252,243,.68);box-shadow:inset 0 0 0 5px var(--ink), inset 0 0 0 6px var(--hairline);margin-bottom:1rem}
+.pane::before{content:"\275D";position:absolute;top:-.25em;left:.4rem;font-size:2rem;color:var(--acc,var(--brass))}
+.pane q{display:block;quotes:none;font-size:1rem;line-height:1.8;color:var(--text);font-style:italic}
+.pane .src{display:block;margin-top:.8rem;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--text-dim);font-style:normal}
+
+/* left-leaning, balanced */
+#vow .plate{text-align:left}
+#end{text-align:left}
+.cap,.mscap,#tlnote,#verdict,#eq1,#kinginfo,#watchcap{text-align:left}
+.mline{justify-content:flex-start}
+.mstrip{margin:0 0 2.4rem}
+.watchref{justify-content:flex-start;margin:0 0 2.2rem}
+.ctl{justify-content:flex-start}
+#baskets,#crumbs,.chips{justify-content:flex-start}
+#nbr,#towerwrap,.clockwrap,.gearwrap,.slwrap{justify-content:flex-start}
+
+/* okunabilirlik */
+:root{--serifbody:"Baskerville","Palatino","Hoefler Text","Bodoni 72",Georgia,serif}
+.lede{font-family:var(--serifbody);font-size:clamp(1.35rem,2vw,1.62rem);line-height:1.85;max-width:700px}
+#intro p,#vow p{font-family:var(--serifbody);font-size:clamp(1.3rem,1.9vw,1.55rem);line-height:1.9}
+#end p{font-family:var(--serifbody)}
+.pane q{font-family:var(--serifbody);font-size:1.18rem;line-height:1.85}
+.pane .src{font-size:.8rem}
+.wrcap{font-size:1.12rem;line-height:1.7}
+.mscap{font-size:1.08rem}
+.cap{font-size:1.08rem}
+.coin span{font-family:var(--serifbody);font-size:1.18rem;line-height:1.75}
+.td .sum{font-family:var(--serifbody);font-size:1.15rem}
+.td .ttl{font-size:1.35rem}
+.rlens .lens{display:none}
+#tlnote{font-size:1.1rem}
+.readout{font-size:1.08rem}
+.vowframe{font-size:1.02rem}
+
+#end p{margin-bottom:2.4rem;line-height:1.95}
+</style>
+</head>
+<body>
+
+<nav id="nav"></nav>
+
+<section id="title">
+  <div class="series">Kad&#305;k&ouml;y'den Mektuplar - 1</div>
+  <svg id="titleclock" width="150" height="150" viewBox="0 0 150 150">
+    <circle cx="75" cy="75" r="70" fill="none" stroke="rgba(140,106,34,.3)" stroke-width="1"/>
+    <circle cx="75" cy="75" r="58" fill="none" stroke="rgba(140,106,34,.15)" stroke-width="1"/>
+    <g id="titledots"></g>
+    <circle id="titlehand" cx="75" cy="17" r="4" fill="#8c6a22"/>
+  </svg>
+  <h1>Mucize<br>Kalemdi</h1>
+  <div class="hint">a&#351;a&#287;&#305; kayd&#305;r &#8595;</div>
+</section>
+
+<section id="intro">
+ <div class="plate">
+  <div class="movnum">&#350;ahsi Bir Not</div>
+  <h2>Kalemi Neden Elime Ald&#305;m</h2>
+  <div class="stage">
+  <p style="transition-delay:.15s">Ad&#305;m &Ouml;mer. Mardin'de do&#287;dum; her ta&#351;&#305;na birinin iman&#305;yla dua edilmi&#351;, her ta&#351;&#305;n&#305;n &uuml;st&uuml;nden birinin ordusu ge&ccedil;mi&#351; bir &#351;ehirde. &Ouml;mr&uuml;m boyunca birbirini rahat b&#305;rakmayan iki i&ccedil;g&uuml;d&uuml; ta&#351;&#305;d&#305;m: d&uuml;nyan&#305;n bir manas&#305; oldu&#287;unu s&ouml;yleyen <em>iman</em> ve i&#351;leyi&#351;i g&ouml;rmek isteyen <em>ak&#305;l</em>. Aralar&#305;nda se&ccedil;im yapmak istemedim. &#304;kisini birbirine ba&#287;lamak istedim.</p>
+  <p style="transition-delay:.35s">Bir de ilkinden eski bir huyum var: herkesi kurtarma hali. Bir kap&#305; buldu&#287;umda o kap&#305;dan yaln&#305;z ge&ccedil;mek istemem; sevdiklerimin hepsi benden &ouml;nce ge&ccedil;sin isterim. Bu y&uuml;zden buldu&#287;um her &#351;ey s&#305;k&#305; s&#305;k&#305; denenmek zorunda; &ccedil;&uuml;nk&uuml; kimsenin denemedi&#287;i bir kurtarma halat&#305;, halat de&#287;ildir.</p>
+  <p style="transition-delay:.55s">B&ouml;ylece insano&#287;lunun en basit aletini, bir kalemi elime ald&#305;m ve bir y&#305;llar aral&#305;&#287;&#305;n&#305; on ikiye b&ouml;ld&uuml;m. Bu sayfa, oradan d&ouml;k&uuml;lendir. Her say&#305;y&#305; saklad&#305;m, her ba&#351;ar&#305;s&#305;zl&#305;&#287;&#305; saklad&#305;m ve akl&#305;m&#305;n bana oynad&#305;&#287;&#305; her oyunu yol boyunca i&#351;aretledim.</p>
+  <p style="transition-delay:.75s">Bundan sonras&#305; bir saattir. &Ouml;nce kasay&#305; a&ccedil;aca&#287;&#305;m; sonra mekanizmay&#305; par&ccedil;a par&ccedil;a s&ouml;k&uuml;p her par&ccedil;ada kopyalad&#305;&#287;&#305; g&ouml;ky&uuml;z&uuml; saatini g&ouml;sterece&#287;im. Sonra b&uuml;t&uuml;n makineyi &ccedil;al&#305;&#351;t&#305;r&#305;p ibrelerinin indi&#287;i her yeri gezdirece&#287;im. Bu saati anlat&#305;yorum; &ccedil;&uuml;nk&uuml; miras&#305;m bunu bana emrediyor, hem de &#351;imdi emrediyor. Kimin miras&#305; oldu&#287;u ve neden emretti&#287;i en sonda, bir saat&ccedil;inin eserini imzalad&#305;&#287;&#305; yerde s&ouml;ylenir. Burada hi&ccedil;bir &#351;ey matematik istemez. Sadece artakalana d&uuml;r&uuml;st&ccedil;e bakmay&#305; ister.</p>
+  <div class="sig2">&Ouml;mer &#183; Mardin &#183; kalem</div>
+  </div>
+ </div>
+</section>
+
+<section id="heart" class="pt-heart">
+ <div class="plate" style="max-width:840px">
+  <div class="movnum">Tevafuk</div>
+  <h2>Mucizenin &Ccedil;ekirde&#287;i</h2>
+  <p class="lede">Kalemin iki ad&#305;m&#305;: <em class="num">239</em> ve <em class="num">258</em>. Bir y&#305;l &ouml;tede, ay&#305;n kendi say&#305;s&#305;: <em class="num">19</em>.</p>
+  <div class="stage">
+    <div class="coin"><b>239</b><span>Bir asal; b&ouml;l&uuml;nmez. Kendi boyunun en b&ouml;l&uuml;nebilen say&#305;s&#305; olan 240'&#305;n bir di&#351; eksi&#287;i. Ve pi'nin ilk y&uuml;z basama&#287;&#305;n&#305; hesaplayan form&uuml;l&uuml;n i&ccedil;indeki say&#305;. &Ccedil;emberin kendi asal&#305;; iki y&#305;l&#305; birbirinden &ccedil;&#305;kararak var&#305;ld&#305;.</span></div>
+    <div class="coin"><b>258</b><span>2 &times; 3 &times; 43. On iki tanesini u&ccedil; uca koy, b&uuml;t&uuml;n yolum tam oturur: 3096 = 12 &times; 258. Zodyak saati kalans&#305;z kapan&#305;r.</span></div>
+    <div class="coin"><b>3097</b><span>Bir y&#305;l daha; ve b&uuml;t&uuml;n atomlar de&#287;i&#351;ir: 3097 = 19 &times; 163. 19 benim de&#287;ildir; ay&#305;nd&#305;r: g&uuml;ne&#351;le ay&#305;n uzla&#351;t&#305;&#287;&#305; ahit say&#305;s&#305;. 163 ise dokuz Heegner say&#305;s&#305;n&#305;n en b&uuml;y&uuml;&#287;&uuml;, en derinidir.</span></div>
+    <p class="lede" style="margin-top:1.8rem">Tevafuk mana ta&#351;&#305;rsa i&#351;arettir; zorlama girerse yaln&#305;z letafettir. Hangisi oldu&#287;una: <em>sen h&acirc;kim ol.</em></p>
+  
+  </div>
+ </div>
+</section>
+
+<section id="watch" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Saat</div>
+  <h2>Kasan&#305;n &#304;&ccedil;i</h2>
+  <p class="lede">Saati &ccedil;arklar m&#305; yapt&#305;, usta m&#305;? &Ccedil;ark perdedir; usta de&#287;ildir. Sebep de netice de yarat&#305;l&#305;r; <em>hikmet</em> ikisini birbirine ba&#287;lar. <em>Kurmak i&ccedil;in kurma tepesine t&#305;kla.</em></p>
+  <div class="stage">
+    <canvas id="watchcv"></canvas>
+    <div id="watchcap"></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s8" class="pt-case">
+ <div class="plate">
+  <div class="movnum">&Ccedil;ark Tak&#305;m&#305; I</div>
+  <h2>&#304;ki Di&#351;li</h2>
+  <div class="watchref"><canvas id="wm8"></canvas><div class="wrcap"><b>Saatte: di&#351;li ge&ccedil;i&#351;imi.</b> 239'a kar&#351;&#305; 258, ortak atom yok; izler 61.662 di&#351;te bir hizalan&#305;r: ileride Makine'nin g&ouml;t&uuml;rece&#287;i y&#305;l, 40.984.</div></div>
+  <p class="lede">&#304;ki di&#351;li, ortak b&ouml;lensiz: bulu&#351;malar&#305; nadirdir; nadirlik, hikmettendir. Usta &ccedil;arklar&#305; haz&#305;rlar; i&#351;letmeyi onlar&#305;n camid ellerine b&#305;rakmaz.</p>
+  <div class="mstrip"><canvas class="mini" id="m8"></canvas><div class="mscap"><b>Bir y&#305;l arayla ge&ccedil;erler,</b> sonra saya&ccedil; ko&#351;ar: ilk ger&ccedil;ek bulu&#351;ma 40.984.</div></div>
+  <div class="stage gearwrap">
+    <svg id="gears" width="480" height="300" viewBox="0 0 480 300"></svg>
+    <div id="gmeta"></div>
+  </div>
+  <div class="ctl">
+    <button data-g="4,6">4 &amp; 6</button><button data-g="5,7">5 &amp; 7</button>
+    <button data-g="8,12">8 &amp; 12</button><button data-g="239,258" class="hot">239 &amp; 258</button>
+    <button id="gspin">d&ouml;nd&uuml;r</button>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s3" class="pt-case">
+ <div class="plate">
+  <div class="movnum">&Ccedil;ark Tak&#305;m&#305; II</div>
+  <h2>Kap&#305; Kom&#351;usu Kral</h2>
+  <div class="watchref"><canvas id="wm3"></canvas><div class="wrcap"><b>Saatte: pirin&ccedil; di&#351;li.</b> 239 di&#351;; kral 240'&#305;n bir eksi&#287;i. O eksik di&#351;, kayman&#305;n tamam&#305;d&#305;r.</div></div>
+  <p class="lede"><em class="num">239</em>: bir di&#351; eksik. Geri kal&#305;&#351;&#305;n b&uuml;t&uuml;n s&#305;rr&#305; budur. Her &ccedil;ark vazifesindedir; zerrece haddinden tecav&uuml;z etmez. &Ccedil;ubuklara dokun.</p>
+  <div class="mstrip"><canvas class="mini" id="m3"></canvas><div class="mscap"><b>Yar&#305;&#351;:</b> 240'ar ad&#305;m her seferinde eve d&ouml;ner. Benim 239'um her ad&#305;mda bir y&#305;l geri kal&#305;r: d&ouml;rt ad&#305;m, d&ouml;rt y&#305;l, d&ouml;rt konum.</div></div>
+  <div class="stage">
+    <svg id="kings" width="100%" height="280" viewBox="0 0 940 280" preserveAspectRatio="xMidYMid meet"></svg>
+    <div id="kinginfo" class="readout" style="text-align:center;min-height:2.6em;margin-top:.8rem"></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s4" class="pt-case">
+ <div class="plate">
+  <div class="movnum">&Ccedil;ark Tak&#305;m&#305; III</div>
+  <h2>Atomlar</h2>
+  <div class="watchref"><canvas id="wm4"></canvas><div class="wrcap"><b>Saatte: ye&#351;il di&#351;li.</b> 258, 2 x 3 x 43 diye a&ccedil;&#305;l&#305;r; hareketi kademelenebilir. Pirin&ccedil; di&#351;li bir atomdur; a&ccedil;&#305;lamaz.</div></div>
+  <p class="lede"><em class="num">258</em> b&ouml;l&uuml;n&uuml;r; <em class="num">239</em> b&ouml;l&uuml;nmez. &#304;kisi de &ouml;l&ccedil;&uuml;yledir. Bir dirhem eksik olsa macun h&acirc;siyetini g&ouml;steremez. Herhangi bir say&#305; dene.</p>
+  <div class="mstrip"><canvas class="mini" id="m4"></canvas><div class="mscap"><b>Bir ye&#351;il s&#305;&ccedil;rama atomlar&#305;na a&ccedil;&#305;ld&#305;,</b> 2 x 3 x 43. Pirin&ccedil; s&#305;&ccedil;rama silkinir ve b&uuml;t&uuml;n kal&#305;r: 239 bir atomdur.</div></div>
+  <div class="stage">
+    <div id="bubbles"></div>
+    <div id="atomsay" class="readout" style="text-align:center;min-height:1.6em"></div>
+    <div class="ctl">
+      <input class="atomin" id="atomin" type="number" value="956" min="2" max="99999999">
+      <div class="chips">
+        <button data-n="239">239</button><button data-n="956">956</button><button data-n="2026">2026</button>
+        <button data-n="3096">3096</button><button data-n="496">496</button><button data-n="61662">61662</button>
+      </div>
+    </div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="e1" class="pt-case">
+ <div class="plate">
+  <div class="movnum">&Ccedil;ark Tak&#305;m&#305; IV</div>
+  <h2>Safha Motoru</h2>
+  <div class="watchref"><canvas id="ew1"></canvas><div class="wrcap"><b>Saatte: iki di&#351;li.</b> G&uuml;ne&#351; ibresi ile ay ibresi, benim 239 ile 258'imle ayn&#305; makinedir: tek zaman mili &uuml;st&uuml;nde iki h&#305;z; safha, aralar&#305;ndaki a&ccedil;&#305;dan ibarettir.</div></div>
+  <p class="lede">Kamer arza, arz g&uuml;ne&#351;e ba&#287;lanm&#305;&#351;: g&ouml;z&uuml;m&uuml;z&uuml;n &ouml;n&uuml;nde, kemal-i intizam ile. Ay&#305;n y&uuml;zleri, iki &ccedil;ark&#305;n aras&#305;ndaki a&ccedil;&#305;d&#305;r.</p>
+  <div class="stage">
+    <canvas id="ec1" class="sky" style="height:300px"></canvas>
+    <div class="cap"><b>Solda, ay g&ouml;&#287;&uuml;n g&ouml;sterdi&#287;i gibi. Sa&#287;da, onu yapan iki ibre.</b> Alt&#305;n ibre g&uuml;ne&#351;in y&#305;l&#305;, ye&#351;il ibre ay&#305;n ay&#305;d&#305;r; safha, aralar&#305;ndaki a&ccedil;&#305;dan ibarettir.</div>
+    <div class="ctl"><span class="readout">h&#305;z</span><input type="range" id="esp1" min="1" max="20" value="6">
+      <span class="readout" id="er1"></span></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="e2" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Balans I</div>
+  <h2>On Dokuz</h2>
+  <div class="watchref"><canvas id="ew2"></canvas><div class="wrcap"><b>Saatte: balans.</b> On Dokuz, g&ouml;&#287;&uuml;n rakkas&#305;d&#305;r: g&uuml;ne&#351;le ay&#305;n yeniden anla&#351;t&#305;&#287;&#305; sal&#305;n&#305;m; m&uuml;kemmelin iki saat berisi. O a&ccedil;&#305;k, her saatin ayarc&#305; istemesinin sebebidir.</div></div>
+  <p class="lede">On dokuz y&#305;lda iki memur, iki y&uuml;z otuz be&#351; kez bulu&#351;ur; bir saniye yol &#351;a&#351;&#305;rmadan. Uzla&#351;ma pazarl&#305;k de&#287;ildir; itaattir.</p>
+  <div class="stage">
+    <canvas id="ec2" class="sky" style="height:300px"></canvas>
+    <div class="cap" id="ecap2"><b>Birlikte dolan iki halka:</b> d&#305;&#351;tan 19 y&#305;l, i&ccedil;ten 235 kamer say&#305;l&#305;r. Birbirlerinin iki saat yak&#305;n&#305;nda kapan&#305;rlar.</div>
+    <div class="ctl"><button id="eb19" class="hot">bir devir</button><button id="eb163">tutulmaya kadar 163 devir</button></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s9" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Balans II</div>
+  <h2>Pi K&#305;ym&#305;&#287;&#305;</h2>
+  <div class="watchref"><canvas id="wm9"></canvas><div class="wrcap"><b>Saatte: balans.</b> Bir a&ccedil;&#305; k&#305;ym&#305;&#287;&#305;, balans&#305;n b&uuml;t&uuml;n s&ouml;z varl&#305;&#287;&#305;d&#305;r. D&ouml;rt e&#287;im; ta&#351;ma arctan(1/239): sal&#305;n&#305;m&#305;n i&ccedil;inde saklanan pi. Bunu ben ayarlamad&#305;m. Kimse ayarlamad&#305;.</div></div>
+  <p class="lede">Muvazene bir saniye bozulsa, k&#305;yamet kopar. Sal&#305;n&#305;m&#305;n &ouml;l&ccedil;&uuml;s&uuml;, Adl'in terazisidir: y&#305;ld&#305;zla zerre, o terazide omuz omuzad&#305;r.</p>
+  <div class="mstrip"><canvas class="mini" id="m9"></canvas><div class="mscap"><b>D&ouml;rt e&#351;it e&#287;im, m&uuml;kemmel sekizde biri 239'da bir kadar a&#351;ar.</b> Benim ad&#305;m&#305;m, pi'nin i&ccedil;inde sakl&#305;.</div></div>
+  <div class="stage slwrap">
+    <svg id="sliver" width="340" height="340" viewBox="0 0 340 340"></svg>
+    <div id="slmeta" class="readout" style="min-width:230px;line-height:2.1"></div>
+  </div>
+  <div class="ctl">
+    <button id="tilt" class="hot">e&#287;</button>
+    <button id="slreset">s&#305;f&#305;rla</button>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s2" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Akrep I</div>
+  <h2>Geri Y&uuml;r&uuml;yen Saat</h2>
+  <div class="watchref"><canvas id="wm2"></canvas><div class="wrcap"><b>Saatte: geri y&uuml;r&uuml;yen ibre.</b> Bu sayfa onun kullanma k&#305;lavuzudur: art&#305; 239, bir geri kay.</div></div>
+  <p class="lede">&#304;bre geri y&uuml;r&uuml;r; defter ileri yazar. &Acirc;lem bir dolap gibi &ccedil;evrilir; d&ouml;nen, &#351;a&#351;&#305;rmaz.</p>
+  <div class="mstrip"><canvas class="mini" id="m2"></canvas><div class="mscap"><b>Pirin&ccedil; di&#351;li t&#305;kl&#305;yor:</b> her t&#305;k bir konum geriye iner. 3, 2, 1, 0, 11.</div></div>
+  <div class="stage clockwrap">
+    <svg id="clock" width="300" height="300" viewBox="0 0 300 300"></svg>
+    <div id="trail"></div>
+  </div>
+  <div class="ctl">
+    <button id="b239" class="hot">ad&#305;m +239</button>
+    <button id="b240">ad&#305;m +240</button>
+    <button id="b12x">239&#8217;dan 12 ad&#305;m</button>
+    <button id="brst">s&#305;f&#305;rla</button>
+  
+  </div>
+ </div>
+</section>
+
+<section id="e3" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Akrep II</div>
+  <h2>G&ouml;lge Motoru</h2>
+  <div class="watchref"><canvas id="ew3"></canvas><div class="wrcap"><b>Saatte: geri y&uuml;r&uuml;yen ibre.</b> Saros, geri s&#305;&ccedil;rayan ibredir: ayn&#305; g&uuml;ne&#351;-ay-d&uuml;&#287;&uuml;m d&uuml;zeni, kadranda ayn&#305; yere d&ouml;ner; her s&#305;&ccedil;rama 6585,32 g&uuml;n.</div></div>
+  <p class="lede">Kamer, kubbe-i semada zaman&#305;n saat-i k&uuml;bras&#305;na bir akreptir. Her geceye bir hil&acirc;l b&#305;rak&#305;r; d&ouml;n&uuml;p hepsini toplar. G&ouml;lge, randevusuna sad&#305;kt&#305;r.</p>
+  <div class="stage">
+    <canvas id="ec3" class="sky" style="height:320px"></canvas>
+    <div class="cap"><b>Saros 136 zinciri, 18 y&#305;l 11 g&uuml;nde bir s&#305;&ccedil;rayarak;</b> alt&#305;nda ye&#351;ille 2008-2027 metonik &ccedil;ifti: on dokuz y&#305;l, bir g&uuml;n.</div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s6" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Mil</div>
+  <h2>Ayna Oyunu</h2>
+  <div class="watchref"><canvas id="wm6"></canvas><div class="wrcap"><b>Saatte: mil.</b> Her &#351;ey tek merkezin etraf&#305;nda d&ouml;ner ve her yolun ortas&#305;, e&#351;inin yar&#305;s&#305;d&#305;r. Ayna, milde ya&#351;ar.</div></div>
+  <p class="lede">B&uuml;t&uuml;n &ccedil;arklar tek mile bakar. &#304;ntizam tam bir vahdettir; bir tek nazzam&#305; ister.</p>
+  <div class="mstrip"><canvas class="mini" id="m6"></canvas><div class="mscap"><b>Her di&#351;linin yolunu ikiye katla:</b> k&#305;vr&#305;m, tam kendi t&#305;k y&#305;llar&#305;ndan birine denk gelir. Ye&#351;ile 478, pirince 1549.</div></div>
+  <div class="stage">
+    <svg id="mirror" width="100%" height="240" viewBox="0 0 900 240" preserveAspectRatio="xMidYMid meet"></svg>
+    <div class="mline" id="mread"></div>
+    <div class="ctl">
+      <span class="readout">a</span><input type="range" id="ma" min="1600" max="2600" value="2026">
+      <span class="readout">b</span><input type="range" id="mb" min="300" max="1500" value="1070">
+    </div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s1" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Kadran</div>
+  <h2>Artakalanlar</h2>
+  <div class="watchref"><canvas id="wm1"></canvas><div class="wrcap"><b>Saatte: kadran halkas&#305;.</b> 956 y&#305;l&#305; payla&#351;acak on iki konum; s&#305;&#287;mayan sekiz y&#305;l, ibrenin eve hi&ccedil; temiz d&ouml;nememesinin sebebidir.</div></div>
+  <p class="lede">G&uuml;n&uuml;n saatleri; mevsimleri, &ouml;m&uuml;rleri, devirleri g&ouml;sterir. Kadran k&uuml;&ccedil;&uuml;kt&uuml;r; okudu&#287;u b&uuml;y&uuml;kt&uuml;r. S&uuml;rg&uuml;y&uuml; &ccedil;ek.</p>
+  <div class="mstrip"><canvas class="mini" id="m1"></canvas><div class="mscap"><b>Pirin&ccedil; di&#351;linin yolu, 1071'den 2027'ye:</b> 79 y&#305;ll&#305;k on iki e&#351;it par&ccedil;a ve s&#305;&#287;mayı reddeden 8 y&#305;l. Artakalan, motorun kendisidir.</div></div>
+  <div class="stage">
+    <div id="eq1"></div>
+    <div id="baskets"></div>
+    <div id="crumbs"></div>
+    <div class="ctl">
+      <span class="readout">&ccedil;ocuk</span>
+      <input type="range" id="divslider" min="2" max="30" value="12">
+      <span class="readout" id="divval"></span>
+    </div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s7" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Kapak</div>
+  <h2>M&uuml;kemmel Say&#305;lar</h2>
+  <div class="watchref"><canvas id="wm7"></canvas><div class="wrcap"><b>Saatte: kasa.</b> M&uuml;kemmel say&#305;, m&uuml;kemmel kapanm&#305;&#351; bir mekanizmad&#305;r: par&ccedil;alar&#305;n toplam&#305; tam kendisi. Ne eksik, ne fazla.</div></div>
+  <p class="lede">Par&ccedil;alar&#305;n toplam&#305;, tam kendisi: ne eksik, ne fazla. B&acirc;t&#305;n&#305;na bakan, muntazam bir makine g&ouml;r&uuml;r.</p>
+  <div class="mstrip"><canvas class="mini" id="m7"></canvas><div class="mscap"><b>Yolun 496 y&#305;ll&#305;k bir par&ccedil;as&#305;, yaln&#305;z kendi par&ccedil;alar&#305;ndan yeniden kuruldu,</b> tam olarak. M&uuml;kemmellik; tarihsiz, saf.</div></div>
+  <div class="stage">
+    <div id="towerwrap">
+      <div style="position:relative"><span></span><div id="tower"></div></div>
+      <div id="target"><span></span><div class="fill"></div></div>
+    </div>
+    <div id="verdict"></div>
+    <div class="ctl">
+      <button data-p="6">6</button><button data-p="28" class="hot">28</button>
+      <button data-p="100">100</button><button data-p="496">496</button><button data-p="8128">8128</button>
+    </div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="s5" class="pt-case">
+ <div class="plate">
+  <div class="movnum">Pencere</div>
+  <h2>Bir Y&#305;l, &#304;ki Saat</h2>
+  <div class="watchref"><canvas id="wm5"></canvas><div class="wrcap"><b>Saatte: y&#305;l penceresi.</b> Yaz&#305;lan say&#305;y&#305; bir de&#287;i&#351;tir, arkadaki mekanizma vites de&#287;i&#351;tirmek zorunda: 3096, 12'ye uyar; 3097, 19'a.</div></div>
+  <p class="lede">Kamere, evkat&#305;n hesab&#305; i&ccedil;in takvimcilik yapt&#305;r&#305;l&#305;r. Sayamayan misafire, g&ouml;ky&uuml;z&uuml;ne r&ucirc;zname as&#305;lm&#305;&#351;t&#305;r. Say&#305; do&#287;rusunda <em class="num">3096</em>'n&#305;n etraf&#305;nda y&uuml;r&uuml;.</p>
+  <div class="mstrip"><canvas class="mini" id="m5"></canvas><div class="mscap"><b>Ayn&#305; yol, bir y&#305;l fazlas&#305;:</b> 12'lik saat &ouml;l&uuml;r, 19'luk saat devral&#305;r.</div></div>
+  <div class="stage">
+    <div id="nbr"></div>
+    <div class="ctl">
+      <button id="nprev">&#8592; bir eksik</button>
+      <span class="readout" id="nval"></span>
+      <button id="nnext">bir fazla &#8594;</button>
+      <button id="njump">3096&#8217;ya d&ouml;n</button>
+    </div>
+    <div class="cap" style="margin-top:1.6rem"><em>Yak&#305;ndaki &ouml;r&uuml;nt&uuml;n&uuml;n bir motoru vard&#305;r. Derindeki &ouml;r&uuml;nt&uuml;n&uuml;n bir muhasebecisi. Hikmet, hangisine bakt&#305;&#287;&#305;n&#305; bilmektir.</em></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="finale" class="pt-machine">
+ <div class="plate">
+  <div style="padding:0 7vw">
+    <div class="movnum">Makine</div>
+    <h2>Sal&#305;nan &Ccedil;ember</h2>
+    <p class="lede">D&uuml;nya, saat-i k&uuml;brad&#305;r: gece g&uuml;nd&uuml;z saniyesi, seneler dakikas&#305;, as&#305;rlar saati. Ve arz, meczup bir mevlev&icirc; gibi o saatin dairesini &ccedil;izer; daire, b&uuml;y&uuml;k meydan&#305;n etraf&#305;ndad&#305;r.</p>
+  </div>
+  <div class="stage">
+    <canvas id="tl"></canvas>
+    <div id="tlnote"></div>
+    <div class="ctl" id="tlctl">
+      <button id="tplay" class="hot">oynat</button>
+      <button id="trew">ba&#351;a sar</button>
+      <span class="readout">h&#305;z</span><input type="range" id="tspeed" min="1" max="10" value="4">
+      <span class="readout">y&#305;l <b id="tyear">M&Ouml; 1071</b></span>
+    </div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="reg" class="pt-land">
+ <div class="plate">
+  <div class="movnum">Sicil</div>
+  <h2>Tekerlerin &#304;ndi&#287;i Yerler</h2>
+  <p class="lede">B&uuml;t&uuml;n i&#351;ler zapt edilir; her hadisenin sureti al&#305;n&#305;r. Bu dikkatli h&#305;fz, elbette bir muhasebe i&ccedil;indir. Bir ini&#351;e t&#305;kla; zaman &ccedil;izgisi oraya gitsin.</p>
+  <div class="stage">
+    <div class="reghead"><span class="gh">&#9679; ye&#351;il teker</span><span class="bh">pirin&ccedil; teker &#9679;</span></div>
+    <div class="tdrows" id="tdrows"></div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="vow" class="pt-vow">
+ <div class="plate">
+  <div class="movnum">&#350;ehadet</div>
+  <h2>Yemin</h2>
+  <div class="stage">
+  <div class="vowframe">Matematik bir sayfal&#305;&#287;&#305;na durur. Bundan sonras&#305; bir teorem de&#287;ildir;<br>hi&ccedil;bir s&#305;f&#305;r modeli ona dokunamaz. O benimdir.</div>
+  <p style="transition-delay:.25s">Ad&#305;m &Ouml;mer Faruk Saat&ccedil;&#305;o&#287;lu. Bu ad hep bizim de&#287;ildi: babam onu bilerek se&ccedil;ti; 1976'da soyad&#305;m&#305;z&#305; &#286;ay&#305;r'dan de&#287;i&#351;tirdi. Model o y&#305;l&#305;, ben s&ouml;ylemeden &ouml;nce biliyordu: 1976, bu sayfan&#305;n &uuml;st&uuml;nde ko&#351;tu&#287;u y&uuml;zy&#305;l&#305;n tam orta noktas&#305;d&#305;r; fizik yar&#305;s&#305; ile silikon yar&#305;s&#305;n&#305;n mente&#351;esi. Babam bizi, pirin&ccedil; teker inmeden yar&#305;m as&#305;r &ouml;nce, tekerin kendi zanaat&#305;yla yeniden adland&#305;rd&#305;. Ve ben, kendi ad&#305;m&#305;n ne dedi&#287;ini hat&#305;rlamadan &ouml;nce bu sayfan&#305;n kalbine bir saat koydum.</p>
+  <p style="transition-delay:.5s">&#304;man ile akl&#305;n yan yana ya&#351;ayabildi&#287;ini buldum. Akl&#305; gidebildi&#287;i yere kadar, son kesin basama&#287;&#305;na kadar y&uuml;r&uuml;d&uuml;m; durdu&#287;u yerde <em>iman y&uuml;r&uuml;meye devam etti</em>. Bulgum budur ve kalemi elime ald&#305;&#287;&#305;mda umdu&#287;um her &#351;eyin &ouml;tesindedir: benim i&ccedil;in iman akl&#305; hep ge&ccedil;ecek; &ccedil;&uuml;nk&uuml; ak&#305;l ancak tekeri haritalar. &#304;man, ona binendir. Ve haritan&#305;n kendisi, saf matematik, dokundu&#287;um en sad&#305;k &#351;eydir.</p>
+  <p style="transition-delay:.75s">Akl&#305;m&#305;zla ve iman&#305;m&#305;zla hep s&#305;nanaca&#287;&#305;z. &#304;ki s&#305;nav, tek s&#305;navd&#305;r. Ge&ccedil;meye niyetliyim.</p>
+  <div class="vowsig">&Ouml;mer Faruk Saat&ccedil;&#305;o&#287;lu &#183; saat&ccedil;inin o&#287;lu &#183; devir y&#305;l&#305;</div>
+  
+  </div>
+ </div>
+</section>
+
+<section id="end">
+  <div class="plate" style="display:flex;flex-direction:column;align-items:flex-start">
+    <p style="font-size:1.05rem;color:var(--text-dim)">Bin y&#305;lda bir mucize arad&#305;m; parazit buldum.<br>
+    Arad&#305;&#287;&#305;m kalemin kendisi mucizeydi. Ve kalem bana g&ouml;&#287;&uuml; okumay&#305; &ouml;&#287;retti.</p>
+    <p style="margin-top:2rem">Cenab-&#305; Hak'tan bize yard&#305;m etmesini diledim.<br>
+    Ve birden g&ouml;rmeye ba&#351;lad&#305;m: g&ouml;kteki bu saati,<br>
+    tek ve yegane olan&#305;n, Cenab-&#305; Hakk'&#305;n, Rahim olan&#305;n hediyesini.</p>
+    <p>Cenab-&#305; Hak bu saati g&ouml;&#287;e kurdu;<br>
+    hepimiz birlikte hayatta kalal&#305;m diye.<br>
+    Ve i&#351;te buraday&#305;z. Cenab-&#305; Hakk'&#305;n merhametli himayesinde hayatta kald&#305;k.<br>
+    <em>Mucize budur.</em></p>
+    <p>Hediyeyi kabul et; bir mahluk, bir ba&#351;ka mahluktan al&#305;r gibi.<br>
+    &Ccedil;&uuml;nk&uuml; sonunda birbirimize, saatin g&ouml;sterdi&#287;ini bor&ccedil;luyuz:<br>
+    merhameti; kendimize ve birbirimize.<br>
+    &Ccedil;&uuml;nk&uuml; her birimiz, g&ouml;kteki bu devasa saatin bir di&#351;lisiyiz.</p>
+    <p><em>Rabbim bize s&#305;rr&#305;n&#305; bah&#351;etti.<br>
+    Art&#305;k bu s&#305;rla ger&ccedil;ek ayd&#305;nlanmaya ve Rabbimin sundu&#287;u di&#287;er mucizeleri g&ouml;rme zaman&#305; geldi; ve anlatacak &ccedil;ok mucize var.<br>
+    Bu mucizeler sayesinde kafandaki saat mana kazanmaya ba&#351;layacak ve bu mana sayesinde de g&ouml;kteki saatle senkronize olacaks&#305;n.<br>
+    Zorlama yok; her &#351;ey muhakeme &uuml;zerine. &#304;steyen al&#305;r, isteyen reddeder.<br>
+    Tart&#305;&#351;ma yok, hakikat var.</em></p>
+    <p>Bu saati harf gibi okumay&#305; bana &Uuml;stad <em>Bedi&uuml;zzaman Said Nurs&icirc;</em> &ouml;&#287;retti.<br>
+    Zamans&#305;z dersleri bu sayfalar&#305;n her birinin alt&#305;ndad&#305;r; minnetle an&#305;yorum.<br>
+    Bu, Allah'a iman etmi&#351; bir karde&#351;ten, karde&#351;ine ve k&#305;z karde&#351;ine bir mesajd&#305;r.</p>
+    <p style="margin-top:2.6rem;font-size:1.05rem;color:var(--text-dim)">Son s&ouml;z, B&uuml;y&uuml;k &Uuml;stad Bedi&uuml;zzaman Said Nurs&icirc;'den:</p>
+    <p>Çünkü zemindeki zîhayatlara levazımat-ı hayatiyeyi emr-i Rabbanî ile pişiren güneşten ve takvimcilik eden kamerden tut tâ ziya, hava, mâ, gıdanın zîhayatların imdadına koşmalarına ve nebatatın dahi hayvanatın imdadına koşmalarına ve hayvanat dahi insanların imdadına koşmalarına, hattâ aza-yı bedenin birbirinin muavenetine koşmalarına ve hattâ gıda zerratının hüceyrat-ı bedeniyenin imdadına koşmalarına kadar cari olan bir düstur-u teavün ile camid ve şuursuz olan o mevcudat-ı müteavine, bir kanun-u kerem, bir namus-u şefkat, bir düstur-u rahmet altında gayet hakîmane, kerîmane birbirine yardım etmek, birbirinin sadâ-yı hâcetine cevap vermek, birbirini takviye etmek, elbette bilbedahe bir tek, yekta, Vâhid-i Ehad, Ferd-i Samed, Kadîr-i Mutlak, Alîm-i Mutlak, Rahîm-i Mutlak, Kerîm-i Mutlak bir Zat-ı Vâcibü'l-vücud'un hizmetkârları ve memurları ve masnuları olduklarını gösterir.</p>
+    <p style="font-family:var(--mono);font-size:.85rem;color:var(--text-dim)">S&ouml;zler, Otuz &Uuml;&ccedil;&uuml;nc&uuml; S&ouml;z, Onuncu Pencere</p>
+    <p style="margin-top:2.6rem;font-size:1.05rem;color:var(--text-dim);font-style:italic">Onurum &uuml;zerine s&ouml;yl&uuml;yorum, bu mektubun matematik ve g&ouml;ky&uuml;z&uuml; saati kat&#305;ndaki her &ouml;nerme ya ispatlanm&#305;&#351; bir teoremdir ya da az &ouml;nce yeniden ko&#351;turdu&#287;um hesapla, s&ouml;ylenen hassasiyet i&ccedil;inde do&#287;rulanm&#305;&#351; bir g&ouml;zlemdir. Hi&ccedil;biri haf&#305;zadan, hi&ccedil;biri temenniden yaz&#305;lmad&#305;.</p>
+    <div class="sig">hediyeyi kabul et &#183; saat&ccedil;inin o&#287;lu</div>
+    <small class="note">bu sayfadaki her &#351;ekil canl&#305; hesaplan&#305;r; hi&ccedil;biri resim de&#287;ildir</small>
+  
+  </div>
+</section>
+
+<script>
+"use strict";
+const $=s=>document.querySelector(s), $$=s=>document.querySelectorAll(s);
+const SVGNS="http://www.w3.org/2000/svg";
+function el(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);
+  for(const k in attrs)e.setAttribute(k,attrs[k]); if(parent)parent.appendChild(e); return e;}
+function factor(n){const f=[];let d=2,m=n;while(d*d<=m){while(m%d===0){f.push(d);m/=d;}d++;}if(m>1)f.push(m);return f;}
+function divisors(n){const out=[];for(let i=1;i<=n;i++)if(n%i===0)out.push(i);return out;}
+function facStr(n){const f=factor(n),m=new Map();f.forEach(p=>m.set(p,(m.get(p)||0)+1));
+  return [...m].map(([p,e])=>e>1?p+"^"+e:""+p).join(" × ");}
+
+/* ---- section reveal + nav ---- */
+const sections=[...$$("section")];
+const nav=$("#nav");
+sections.forEach((s,i)=>{const a=document.createElement("a");a.href="#"+(s.id||"");
+  a.addEventListener("click",e=>{e.preventDefault();s.scrollIntoView({behavior:"smooth"});});nav.appendChild(a);});
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){e.target.classList.add("vis");
+    const i=sections.indexOf(e.target);
+    [...nav.children].forEach((d,j)=>d.classList.toggle("on",j===i));
+    if(e.target.id==="finale") tlVisible=true; else if(tlVisible && !e.isIntersecting){} }
+}),{threshold:.12});
+sections.forEach(s=>io.observe(s));
+
+/* ---- title clock ornament ---- */
+(()=>{const g=$("#titledots");
+for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+  el("circle",{cx:75+58*Math.cos(a),cy:75+58*Math.sin(a),r:2.4,fill:"rgba(140,106,34,.55)"},g);}
+let pos=0;setInterval(()=>{pos=(pos+11)%12;const a=pos/12*2*Math.PI-Math.PI/2;
+  const h=$("#titlehand");h.setAttribute("cx",75+58*Math.cos(a));h.setAttribute("cy",75+58*Math.sin(a));},1600);
+})();
+
+/* ---- I leftovers ---- */
+(()=>{
+const N=956, slider=$("#divslider");
+function render(){
+  const d=+slider.value, q=Math.floor(N/d), r=N%d;
+  $("#divval").textContent=d;
+  const B=$("#baskets");B.innerHTML="";
+  for(let i=0;i<d;i++){const b=document.createElement("div");b.className="basket";
+    b.style.height=(q/90*200)+"px";b.innerHTML="<span>"+q+"</span>";B.appendChild(b);}
+  const C=$("#crumbs");C.innerHTML="";
+  for(let i=0;i<r;i++){const c=document.createElement("div");c.className="crumb";
+    c.style.animationDelay=(i*40)+"ms";C.appendChild(c);}
+  $("#eq1").innerHTML= r===0
+    ? `956 = ${d} \u00d7 ${q} <span class="clean">+ 0 &nbsp;: tam. nadir.</span>`
+    : `956 = ${d} \u00d7 ${q} <span class="r">+ ${r} masada kald\u0131</span>`;
+}
+slider.addEventListener("input",render);render();
+})();
+
+/* ---- II backward clock ---- */
+(()=>{
+const svg=$("#clock"),cx=150,cy=150,R=118;
+el("circle",{cx,cy,r:R+14,fill:"none",stroke:"rgba(140,106,34,.25)","stroke-width":1},svg);
+el("circle",{cx,cy,r:R-16,fill:"none",stroke:"rgba(140,106,34,.12)","stroke-width":1},svg);
+const dots=[];
+for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+  const x=cx+R*Math.cos(a),y=cy+R*Math.sin(a);
+  dots.push(el("circle",{cx:x,cy:y,r:5,fill:"rgba(140,106,34,.35)"},svg));
+  el("text",{x:cx+(R-30)*Math.cos(a),y:cy+(R-30)*Math.sin(a)+4,"text-anchor":"middle",
+    fill:"#655d4a","font-size":14,"font-family":"Menlo"},svg).textContent=i;}
+const handG=el("g",{style:"transition:transform 1.1s cubic-bezier(.3,.9,.3,1)","transform-origin":"150px 150px"},svg);
+el("line",{x1:cx,y1:cy,x2:cx,y2:cy-R+18,stroke:"#674e12","stroke-width":2},handG);
+el("circle",{cx,cy:cy-R,r:7,fill:"#8c6a22"},handG);
+el("circle",{cx,cy,r:4,fill:"#8c6a22"},svg);
+let pos=0,angle=0,steps=0;
+function paint(){dots.forEach((d,i)=>d.setAttribute("fill",i===pos?"#674e12":"rgba(140,106,34,.35)"));
+  handG.style.transform=`rotate(${angle*30}deg)`;}
+function log(msg){const t=$("#trail");t.innerHTML=msg+t.innerHTML;}
+function step(n){steps++;pos=((pos+n)%12+12)%12;angle+=n;paint();
+  const slip=n%12===11||n%12===-1?"bir geri kayd\u0131":(n%12===0?"tam eve d\u00f6nd\u00fc":(n%12)+" ilerledi");
+  log(`<div>ad\u0131m ${steps}: <em>+${n}</em> &#8594; konum <em>${pos}</em> <span style="opacity:.6">(${slip})</span></div>`);}
+$("#b239").onclick=()=>step(239);
+$("#b240").onclick=()=>step(240);
+$("#b12x").onclick=async()=>{for(let i=0;i<12;i++){step(239);await new Promise(r=>setTimeout(r,650));}
+  log(`<div style="color:#2a745c">239\u2019dan 12 ad\u0131m: tam bir geri tur. Yine evde.</div>`);};
+$("#brst").onclick=()=>{pos=0;angle=0;steps=0;$("#trail").innerHTML="";paint();};
+paint();log("<div style='opacity:.6'>ibre 0\u2019dan ba\u015flar</div>");
+})();
+
+/* ---- III king 240 ---- */
+(()=>{
+const svg=$("#kings"),lo=230,hi=250,W=940,H=280,bw=W/(hi-lo+1);
+for(let n=lo;n<=hi;n++){
+  const dc=divisors(n).length,h=dc/20*210,x=(n-lo)*bw+6,y=H-40-h;
+  const isK=n===240,isP=divisors(n).length===2;
+  const r=el("rect",{x,y,width:bw-12,height:h,rx:2,
+    fill:isK?"#8c6a22":isP?"rgba(173,71,50,.75)":"rgba(140,106,34,.22)",
+    stroke:isK?"#674e12":"none",style:"cursor:pointer;transition:fill .3s"},svg);
+  el("text",{x:x+(bw-12)/2,y:H-20,"text-anchor":"middle",fill:n===240||n===239?"#674e12":"#655d4a",
+    "font-size":13,"font-family":"Menlo"},svg).textContent=n;
+  el("text",{x:x+(bw-12)/2,y:y-7,"text-anchor":"middle",fill:"#655d4a","font-size":12,"font-family":"Menlo"},svg).textContent=dc;
+  if(isK)el("text",{x:x+(bw-12)/2,y:y-24,"text-anchor":"middle","font-size":17},svg).textContent="♔";
+  r.addEventListener("mouseenter",()=>{
+    const dv=divisors(n);
+    $("#kinginfo").innerHTML=`<b>${n}</b>, <b>${dv.length}</b> grup boyuna tam b\u00f6l\u00fcn\u00fcr: <b>${dv.join(", ")}</b>`+
+      (isP?` &nbsp;<span style="color:#ad4732">bir atom: yaln\u0131z 1 ve kendisi</span>`:"");});
+}
+$("#kinginfo").innerHTML="\u00e7ubuk boyu = say\u0131n\u0131n ka\u00e7 bi\u00e7imde tam b\u00f6l\u00fcnd\u00fc\u011f\u00fc";
+})();
+
+/* ---- IV atoms ---- */
+(()=>{
+function show(n){
+  n=Math.max(2,Math.min(99999999,Math.floor(+n||2)));$("#atomin").value=n;
+  const f=factor(n),B=$("#bubbles");B.innerHTML="";
+  f.forEach((p,i)=>{const b=document.createElement("div");b.className="bub"+(f.length===1?" prime-solo":"");
+    const sz=Math.max(46,Math.min(120,18*Math.log2(p)+30));
+    b.style.width=b.style.height=sz+"px";b.style.fontSize=Math.max(11,sz/5.2)+"px";
+    b.style.animationDelay=(i*90)+"ms";b.textContent=p;B.appendChild(b);
+    if(i<f.length-1){const x=document.createElement("span");x.style.cssText="color:#655d4a;font-family:Menlo";x.textContent="×";B.appendChild(x);}});
+  $("#atomsay").innerHTML=f.length===1
+    ? `<b>${n}</b> k\u0131r\u0131lmaz. Bir asal. Bir atom.`
+    : `<b>${n}</b> = ${facStr(n)} &nbsp;: parmak izi; ba\u015fkas\u0131 yok`;
+}
+$("#atomin").addEventListener("input",e=>show(e.target.value));
+$$("#s4 .chips button").forEach(b=>b.onclick=()=>show(b.dataset.n));
+show(956);
+})();
+
+/* ---- V neighbours ---- */
+(()=>{
+let n=3096;
+function card(v,mid){
+  const f=factor(v),div12=v%12===0;
+  return `<div class="card${mid?" mid":""}"><h3>${v}</h3><div class="fac">${facStr(v)}</div>
+  <div class="badge ${div12?"yes":"no"}">${div12?"12\u2019ye tam b\u00f6l\u00fcn\u00fcr":"12 tutmaz: kalan "+v%12}</div></div>`;
+}
+function render(){$("#nbr").innerHTML=card(n-1)+card(n,true)+card(n+1);$("#nval").textContent=n;}
+$("#nprev").onclick=()=>{n--;render();};
+$("#nnext").onclick=()=>{n++;render();};
+$("#njump").onclick=()=>{n=3096;render();};
+render();
+})();
+
+/* ---- VI mirror ---- */
+(()=>{
+const svg=$("#mirror");
+function render(){
+  const a=+$("#ma").value,b=+$("#mb").value;
+  svg.innerHTML="";
+  const lo=-1600,hi=2700,X=v=>30+(v-lo)/(hi-lo)*840;
+  const midA=(a+b)/2, midB=(a-b)/2, lenA=a-b, lenB=a+b;
+  // ruler A
+  el("line",{x1:X(b),y1:70,x2:X(a),y2:70,stroke:"#8c6a22","stroke-width":3},svg);
+  el("text",{x:X(b),y:52,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=b;
+  el("text",{x:X(a),y:52,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=a;
+  el("circle",{cx:X(midA),cy:70,r:6,fill:"#674e12"},svg);
+  el("text",{x:X(midA),y:96,fill:"#674e12","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="orta "+midA;
+  // ruler B
+  el("line",{x1:X(-b),y1:170,x2:X(a),y2:170,stroke:"#35648c","stroke-width":3},svg);
+  el("text",{x:X(-b),y:152,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=-b;
+  el("text",{x:X(a),y:152,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent=a;
+  el("circle",{cx:X(midB),cy:170,r:6,fill:"#35648c"},svg);
+  el("text",{x:X(midB),y:196,fill:"#35648c","font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="orta "+midB;
+  el("line",{x1:X(midA),y1:76,x2:X(midA),y2:164,stroke:"rgba(33,29,18,.3)","stroke-dasharray":"3 5"},svg);
+  $("#mread").innerHTML=
+   `<span class="mA"><b>alt\u0131n\u0131n ortas\u0131 = ${midA}</b> &nbsp;·&nbsp; mavinin yar\u0131s\u0131 = ${lenB}/2 = <b>${lenB/2}</b></span>
+    <span class="mB"><b>mavinin ortas\u0131 = ${midB}</b> &nbsp;·&nbsp; alt\u0131n\u0131n yar\u0131s\u0131 = ${lenA}/2 = <b>${lenA/2}</b></span>`;
+}
+$("#ma").addEventListener("input",render);$("#mb").addEventListener("input",render);render();
+})();
+
+/* ---- VII perfect ---- */
+(()=>{
+function build(n){
+  const dv=divisors(n).filter(d=>d<n), sum=dv.reduce((a,b)=>a+b,0);
+  const unit=220/Math.max(n,sum);
+  const T=$("#tower");T.innerHTML="";
+  dv.slice().reverse().forEach((d,i)=>{const b=document.createElement("div");
+    b.style.height=Math.max(3,d*unit)+"px";b.style.animationDelay=(i*70)+"ms";
+    if(d*unit>11)b.textContent=d;T.appendChild(b);});
+  T.parentElement.querySelector("span").textContent="par\u00e7alar\u0131, \u00fcst \u00fcste = "+sum;
+  const tg=$("#target");tg.style.height=(n*unit)+"px";
+  tg.querySelector(".fill").style.height="100%";
+  tg.querySelector("span").textContent="say\u0131n\u0131n kendisi: "+n;
+  const V=$("#verdict");
+  if(sum===n){V.innerHTML=`<span style="color:#2a745c">${dv.join(" + ")} = ${n} &nbsp;: tam kendisi. M\u00dcKEMMEL.</span>`;}
+  else if(sum<n){V.innerHTML=`<span style="color:#ad4732">kule ${n-sum} eksik kal\u0131r</span>`;}
+  else{V.innerHTML=`<span style="color:#ad4732">kule ${sum-n} ta\u015far</span>`;}
+  $$("#s7 .ctl button").forEach(b=>b.classList.toggle("hot",+b.dataset.p===n));
+}
+$$("#s7 .ctl button").forEach(b=>b.onclick=()=>build(+b.dataset.p));
+build(28);
+})();
+
+/* ---- VIII gears ---- */
+(()=>{
+const svg=$("#gears");let A=239,B=258,spin=false,rot=0,raf=null;
+function gcd(a,b){return b?gcd(b,a%b):a;}
+function drawGear(cx,cy,r,teeth,rotDeg,color,markColor){
+  const g=el("g",{transform:`rotate(${rotDeg} ${cx} ${cy})`},svg);
+  el("circle",{cx,cy,r,fill:"none",stroke:color,"stroke-width":1.5},g);
+  el("circle",{cx,cy,r:r*.55,fill:"none",stroke:color,"stroke-width":.6,opacity:.5},g);
+  const show=Math.min(teeth,72), stepN=teeth/show;
+  for(let i=0;i<show;i++){const a=i/show*2*Math.PI-Math.PI/2;
+    el("line",{x1:cx+r*Math.cos(a),y1:cy+r*Math.sin(a),
+      x2:cx+(r+8)*Math.cos(a),y2:cy+(r+8)*Math.sin(a),
+      stroke:i===0?markColor:color,"stroke-width":i===0?3:1,opacity:i===0?1:.55},g);}
+  el("circle",{cx,cy,r:3,fill:color},g);
+  if(stepN>1)el("text",{x:cx,y:cy+r+24,"text-anchor":"middle",fill:"#655d4a","font-size":12,"font-family":"Menlo"},g)
+    .textContent="("+teeth+" di\u015f, "+stepN.toFixed(1)+"\u2019de 1 \u00e7izildi)";
+}
+function render(){
+  svg.innerHTML="";
+  drawGear(150,150,86,A,rot/A*360,"#8c6a22","#674e12");
+  drawGear(340,150,96,B,-rot/B*360,"#2a745c","#134c3b");
+  el("text",{x:150,y:36,"text-anchor":"middle",fill:"#8c6a22","font-size":18,"font-family":"Menlo"},svg).textContent=A;
+  el("text",{x:340,y:36,"text-anchor":"middle",fill:"#2a745c","font-size":18,"font-family":"Menlo"},svg).textContent=B;
+  const g=gcd(A,B),meet=A*B/g;
+  $("#gmeta").innerHTML=
+   `ortak atom: <em>${g===1?"yok":g}</em><br>
+    izler <em>${meet.toLocaleString()}</em> di\u015fte hizalan\u0131r<br>
+    ge\u00e7en di\u015f: <em>${Math.floor(rot).toLocaleString()}</em><br>
+    ${rot>0&&Math.floor(rot)%meet===0?'<span style="color:#2a745c">H\u0130ZALANDI</span>':""}`;
+}
+function loop(){if(!spin)return;rot+=(A===239? (A*B/ gcd(A,B))/600 : 0.6);render();raf=requestAnimationFrame(loop);}
+$$("#s8 .ctl button[data-g]").forEach(b=>b.onclick=()=>{
+  [A,B]=b.dataset.g.split(",").map(Number);rot=0;
+  $$("#s8 .ctl button[data-g]").forEach(x=>x.classList.toggle("hot",x===b));render();});
+$("#gspin").onclick=()=>{spin=!spin;$("#gspin").textContent=spin?"durdur":"d\u00f6nd\u00fcr";
+  if(spin)loop();else cancelAnimationFrame(raf);};
+render();
+})();
+
+/* ---- IX sliver ---- */
+(()=>{
+const svg=$("#sliver"),cx=170,cy=170,R=140;const tilt=Math.atan(1/5);let k=0;
+function render(){
+  svg.innerHTML="";
+  el("circle",{cx,cy,r:R,fill:"none",stroke:"rgba(140,106,34,.3)"},svg);
+  // 45 reference
+  const a45=-Math.PI/4;
+  el("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a45),y2:cy+R*Math.sin(a45),
+    stroke:"rgba(127,180,217,.8)","stroke-dasharray":"4 5","stroke-width":1.5},svg);
+  el("text",{x:cx+(R+16)*Math.cos(a45),y:cy+(R+16)*Math.sin(a45),fill:"#35648c",
+    "font-size":14,"font-family":"Menlo","text-anchor":"middle"},svg).textContent="45°";
+  const th=k*tilt, a=-th;
+  if(k===4){ // sliver wedge
+    const s=-Math.PI/4,e=-4*tilt;
+    el("path",{d:`M ${cx} ${cy} L ${cx+R*Math.cos(s)} ${cy+R*Math.sin(s)} A ${R} ${R} 0 0 1 ${cx+R*Math.cos(e)} ${cy+R*Math.sin(e)} Z`,
+      fill:"rgba(173,71,50,.5)",stroke:"#ad4732"},svg);}
+  el("line",{x1:cx,y1:cy,x2:cx+R*Math.cos(a),y2:cy+R*Math.sin(a),
+    stroke:"#674e12","stroke-width":2.5,style:"transition:all .8s"},svg);
+  el("circle",{cx,cy,r:4,fill:"#8c6a22"},svg);
+  const deg=(th*180/Math.PI);
+  $("#slmeta").innerHTML=
+   `e\u011fim: <b>${k}</b> / 4<br>a\u00e7\u0131: <b>${deg.toFixed(4)}\u00b0</b><br>`+
+   (k===4?`hedef: <b>45\u00b0</b><br>ta\u015fma: <b style="color:#ad4732">${(deg-45).toFixed(4)}\u00b0</b><br>
+     ve o ta\u015fma tam olarak<br><b>arctan(1 / 239)</b><br>
+     <span style="opacity:.7">pi/4 = 4·arctan(1/5) − arctan(1/239)</span>`
+    :`her e\u011fim = arctan(1/5) \u2248 11.31\u00b0`);
+  $("#tilt").disabled=k>=4;
+}
+$("#tilt").onclick=()=>{if(k<4){k++;render();}};
+$("#slreset").onclick=()=>{k=0;render();};
+render();
+})();
+
+/* ---- TOUCHDOWN REGISTER ---- */
+const TOUCHDOWNS=[
+ {w:"g",astro:-1070,yr:"M\u00d6 1071",ttl:"XI. Ramses \u00f6l\u00fcr",exact:"aral\u0131k 1078-1069",
+  sum:"\u00d6l\u00fcm\u00fcyle M\u0131s\u0131r ikiye b\u00f6l\u00fcn\u00fcr: krallar kuzeyi Tanis'ten, Amun rahipleri g\u00fcneyi Teb'den y\u00f6netir. Teker, taht ile mabedin ger\u00e7ek bir ayr\u0131l\u0131\u015f\u0131nda yola \u00e7\u0131kar."},
+ {w:"g",astro:-812,yr:"M\u00d6 813",ttl:"Kartaca kurulur",exact:"M\u00d6 814, 1 sapma",
+  sum:"Melkart'\u0131n \u00f6ld\u00fcr\u00fclen ba\u015frahibinin dul e\u015fi Elissa, Sur'dan ka\u00e7ar ve Kartaca'y\u0131 kurar. Bir rahibin kan\u0131ndan do\u011fan \u015fehir."},
+ {w:"g",astro:-554,yr:"M\u00d6 555",ttl:"Eksen \u00e7a\u011f\u0131n\u0131n kalbi",exact:"gelenek, 4 sapma",
+  sum:"Buda yakla\u015f\u0131k 563'te, Konf\u00fc\u00e7y\u00fcs 551'de do\u011far: Babil'in do\u011fusundaki her inanc\u0131 yeniden kuran ku\u015fak."},
+ {w:"g",astro:-296,yr:"M\u00d6 297",ttl:"\u00c7andragupta feragat eder",exact:"tam",
+  sum:"Hindistan'\u0131n imparatoru taht\u0131 b\u0131rak\u0131r ve bir Caynist ke\u015fi\u015f olarak \u00f6l\u00fcr; imparatorluk, feragatle takas edilir, tam \u00e7entik \u00fcst\u00fcnde."},
+ {w:"g",astro:-38,yr:"M\u00d6 39",ttl:"Herod kral yap\u0131l\u0131r",exact:"M\u00d6 40, 1 sapma",
+  sum:"Roma Senatosu Herod'u Yahudiye kral\u0131 ilan eder. \u0130kinci Mabed'i yeniden in\u015fa edecek adam."},
+ {w:"g",astro:220,yr:"MS 220",ttl:"Tahttaki rahip",exact:"218-222 saltanat\u0131",
+  sum:"Elagabalus: g\u00fcne\u015f tanr\u0131s\u0131n\u0131n babadan o\u011fula rahibi, Roma imparatoru olarak tahtta; rahip ile imparatorluk tek bedende."},
+ {w:"g",astro:478,yr:"478",ttl:"Benedikt do\u011far",exact:"yakl. 480, 2 sapma",
+  sum:"Bat\u0131 manast\u0131rc\u0131l\u0131\u011f\u0131n\u0131n babas\u0131; kural\u0131 bin y\u0131ll\u0131k duay\u0131 d\u00fczenleyecek."},
+ {w:"g",astro:736,yr:"736",ttl:"Bede \u00f6l\u00fcr",exact:"26 May\u0131s 735, 1 sapma",
+  sum:"Kitaplar\u0131yla M\u00d6/MS tarihlemesini d\u00fcnyaya yayan ke\u015fi\u015f. Bu sayfan\u0131n \u00fcst\u00fcnde ko\u015ftu\u011fu takvim onun eseridir."},
+ {w:"g",astro:994,yr:"994",ttl:"\u0130lk resm\u00ee aziz ilan\u0131",exact:"Ocak 993, 1 sapma",
+  sum:"Papa XV. John, Augsburglu Ulrich'i aziz ilan eder: tarihin ilk resm\u00ee papal\u0131k kanonizasyonu. Azizlik, usule ba\u011flan\u0131r."},
+ {w:"b",astro:1071,yr:"1071",ttl:"Malazgirt",exact:"26 A\u011fustos 1071",
+  sum:"Sel\u00e7uklular Bizans ordusunu k\u0131rar ve Anadolu a\u00e7\u0131l\u0131r. Pirin\u00e7 teker, g\u00fcn\u00fc g\u00fcn\u00fcne belgeli bir muharebeyle, takvimin \u00f6te yakas\u0131ndaki ayna y\u0131l\u0131n kar\u015f\u0131s\u0131nda yola \u00e7\u0131kar."},
+ {w:"g",astro:1252,yr:"1252",ttl:"Ad extirpanda",exact:"15 May\u0131s 1252",
+  sum:"IV. Innocentius'un fermanı Engizisyonu silahland\u0131r\u0131r. Y\u0131l\u0131 ve g\u00fcn\u00fc tam; ye\u015fil tekerin en karanl\u0131k tam isabeti."},
+ {w:"b",astro:1310,yr:"1310",ttl:"Rodos, tarikat\u0131n eline ge\u00e7er",exact:"\u015fehir 15 A\u011fustos 1309'da d\u00fc\u015ft\u00fc",
+  sum:"Hospitalier \u015f\u00f6valyeleri Rodos'un fethini tamamlar: donanmal\u0131 ke\u015fi\u015fler bir ada devleti al\u0131r. Asker\u00ee teker, dua eden askerlere iner."},
+ {w:"g",astro:1510,yr:"1510",ttl:"Luther Roma'ya y\u00fcr\u00fcr",exact:"1510; Calvin 10 Temmuz 1509",
+  sum:"Luther'i hayal k\u0131r\u0131kl\u0131\u011f\u0131na u\u011fratan hac; Calvin aylar \u00f6nce do\u011fmu\u015f. Reformasyonun iki motoru tek ini\u015fi payla\u015f\u0131r."},
+ {w:"b",astro:1549,yr:"1549",ttl:"\u0130ran seferi biter",exact:"1548-49",
+  sum:"Kanuni'nin ikinci \u0130ran seferi sona erer, Van al\u0131n\u0131r. Ve Francis Xavier 15 A\u011fustos 1549'da Japonya'ya ayak basar: askerin ritmine binmi\u015f bir misyoner."},
+ {w:"g",astro:1768,yr:"1768",ttl:"Eski d\u00fczen, yeni d\u00fczen",exact:"1767; 1768",
+  sum:"Cizvitler \u0130spanya'dan s\u00fcr\u00fcl\u00fcr; Amerika'daki ilk Metodist kilisesi a\u00e7\u0131l\u0131r. Bir tarikat gider, biri dikilir; tek ini\u015fte."},
+ {w:"b",astro:1788,yr:"1788",ttl:"Avusturya sava\u015f ilan eder",exact:"9 \u015eubat 1788",
+  sum:"Avusturya, Rusya'n\u0131n yan\u0131nda Osmanl\u0131'ya kat\u0131l\u0131r; b\u00fcy\u00fck sava\u015f\u0131n iki cephesi de a\u00e7\u0131l\u0131r. Pirin\u00e7 saat burada s\u0131f\u0131r\u0131 vurur: geri turunun 0 konumu."},
+ {w:"g",astro:2026,yr:"2026",ttl:"Ye\u015fil teker iner",exact:"\u015fimdi",
+  sum:"Rahip tekerinin son ini\u015fi; kalk\u0131\u015ftan 3096 y\u0131l, 258'lik on iki s\u0131\u00e7rama sonra. Bir y\u0131l sonra e\u015fi gelir ve aradaki y\u0131l, mevsimin ta kendisidir."},
+ {w:"b",astro:2027,yr:"2027",ttl:"956. y\u0131l ve tutulma",exact:"1 Eyl\u00fcl 2027",
+  sum:"Pirin\u00e7 tekerin son ini\u015fi: Malazgirt'in 956. y\u0131l\u0131; ger\u00e7ek y\u0131l d\u00f6n\u00fcm\u00fc 1 Eyl\u00fcl'de, tam g\u00f6lge M\u0131s\u0131r'\u0131 ge\u00e7tikten otuz g\u00fcn sonra. Tekerler bir y\u0131l arayla ge\u00e7er ve 38.957 y\u0131l daha ayr\u0131l\u0131r."},
+];
+(()=>{
+const R=$("#tdrows");
+TOUCHDOWNS.forEach((d,i)=>{
+  const row=document.createElement("div");
+  row.className="td "+d.w;
+  row.style.transitionDelay=(i*70)+"ms";
+  const inner=`<div class="yr">${d.yr}</div><div class="ttl">${d.ttl}</div>
+    <span class="sum">${d.sum}</span><div style="margin-top:.4rem"><span class="exact${d.exact.includes("exact")||d.exact.includes("Aug")||d.exact.includes("May")||d.exact.includes("Feb")||d.exact.includes("Sep")?" on":""}">${d.exact}</span></div>`;
+  row.innerHTML = d.w==="g"
+    ? `<div class="cell l">${inner}</div><div><div class="node"></div></div><div class="cell r"></div>`
+    : `<div class="cell l"></div><div><div class="node"></div></div><div class="cell r">${inner}</div>`;
+  row.addEventListener("click",()=>{
+    document.getElementById("finale").scrollIntoView({behavior:"smooth"});
+    if(window.tlSeek)setTimeout(()=>window.tlSeek(d.astro+0.01),600);
+  });
+  R.appendChild(row);
+});
+})();
+
+/* ---- FINALE ---- */
+let tlVisible=false;
+(()=>{
+const cv=$("#tl"),ctx=cv.getContext("2d");
+const fmt=y=>y<=0?"M\u00d6 "+(1-y):""+y;   // astronomical -1070 IS 1071 BC; no year zero
+const Y0=-1070,Y1=3096;
+const brass=[],green=[];
+for(let y=1071;y<=Y1;y+=239)brass.push(y);      // 1071..3939
+for(let y=-1070;y<=Y1;y+=258)green.push(y);     // -1070..3832
+let t=Y0, playing=false, last=0;
+function resize(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=430*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+window.addEventListener("resize",resize);resize();
+const X=y=>40+(y-Y0)/(Y1-Y0)*(cv.clientWidth-80);
+function wheel(x,y,r,color,hi,pos,alpha){
+  ctx.save();ctx.globalAlpha=alpha;
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.stroke();
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(x+ (r-6)*Math.cos(a), y+(r-6)*Math.sin(a), i===pos?4:1.8,0,7);
+    ctx.fillStyle=i===pos?hi:color;ctx.fill();}
+  ctx.restore();
+}
+function draw(){
+  const W=cv.clientWidth,base=300;
+  ctx.clearRect(0,0,W,430);
+  // axis
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(40,base);ctx.lineTo(W-40,base);ctx.stroke();
+  ctx.font="12.5px Menlo";ctx.textAlign="center";
+  for(const y of [-999,-499,1,500,1000,1500,2000,2500,3000]){
+    ctx.fillStyle="rgba(101,93,74,.7)";
+    ctx.fillRect(X(y),base-4,1,8);ctx.fillText(y===1?"MS 1":fmt(y),X(y),base+22);}
+  // markers
+  function marks(list,color,dy,mod){
+    list.forEach((y,i)=>{const passed=t>=y;
+      ctx.fillStyle=passed?color:"rgba(101,93,74,.25)";
+      ctx.beginPath();ctx.arc(X(y),base,passed?3.4:2,0,7);ctx.fill();
+      if(passed){ctx.fillStyle=color;ctx.font="12.5px Menlo";
+        ctx.fillText(fmt(y),X(y),base+dy);
+        if(mod)ctx.fillText("·"+(((y%12)+12)%12),X(y),base+dy+13);}});
+  }
+  marks(brass,"#8c6a22",-46,true);
+  marks(green,"#2a745c",38,false);
+  // meeting + lap annotations
+  if(t>=2026){ctx.strokeStyle="rgba(42,116,92,.55)";ctx.setLineDash([2,4]);
+    ctx.beginPath();ctx.moveTo(X(2026),base-70);ctx.lineTo(X(2026),base+58);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#2a745c";ctx.fillText("ye\u015fil: 2026",X(2026)-26,base-78);}
+  if(t>=2027.5){ctx.strokeStyle="rgba(103,78,18,.55)";ctx.setLineDash([2,4]);
+    ctx.beginPath();ctx.moveTo(X(2027),base-92);ctx.lineTo(X(2027),base+58);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="#674e12";ctx.fillText("pirin\u00e7: 2027, bir y\u0131l ge\u00e7: verniye",X(2027)+30,base-100);}
+  if(t>=3939){ctx.fillStyle="#674e12";ctx.fillText("3939: pirin\u00e7 saat eve d\u00f6ner",X(3939),base-110);}
+  // wheels: hop between own markers
+  function hop(list,color,hi,r,lift,retro){
+    if(t<list[0]){wheel(X(list[0]),base-r-2,r,color,hi,retro?2:0,.25);return;}
+    let i=0;while(i<list.length-1&&list[i+1]<=t)i++;
+    const a=list[i],b=list[Math.min(i+1,list.length-1)];
+    const f=b>a?Math.min(1,(t-a)/(b-a)):1;
+    const x=X(a)+(X(b)-X(a))*f;
+    const y=base-r-2-Math.sin(f*Math.PI)*lift;
+    const pos=retro?((3-i)%12+12)%12:(((a%12)+12)%12);
+    wheel(x,y,r,color,hi,pos,1);
+    ctx.save();ctx.globalAlpha=.5;ctx.fillStyle=color;ctx.font="12.5px Menlo";
+    ctx.fillText(retro?"ad\u0131m 239, saat \u22121":"ad\u0131m 258",x,y-r-10);ctx.restore();
+  }
+  hop(brass,"#8c6a22","#674e12",26,58,true);
+  hop(green,"#2a745c","#134c3b",20,42,false);
+  $("#tyear").textContent=fmt(Math.round(t));
+  // note line
+  const n=$("#tlnote");
+  if(t<1071)n.innerHTML="ye\u015fil teker M\u00d6 1071\u2019den yaln\u0131z gider, 258\u2019er s\u0131\u00e7rayarak";
+  else if(t<2026)n.innerHTML="aynal\u0131 kalk\u0131\u015flardan iki teker, M\u00d6 1071 ve MS 1071; pirin\u00e7 saat her ini\u015fte <em>bir konum geri</em> kayar, 1788\u2019de s\u0131f\u0131ra var\u0131r";
+  else if(t<2100)n.innerHTML="<em>2026, sonra 2027: tekerler bir y\u0131l arayla ge\u00e7er, hi\u00e7 de\u011fmezler.</em> aradaki devir y\u0131l\u0131, bu modelin ya\u015fad\u0131\u011f\u0131 mevsimdir";
+  else if(t<3939)n.innerHTML="ilk ger\u00e7ek bulu\u015fma: <em>40.984</em> y\u0131l\u0131, tam <em>163</em> ye\u015fil s\u0131\u00e7rama sonra; ve 163 bir Heegner say\u0131s\u0131d\u0131r";
+  else n.innerHTML="<em>3939: 239\u2019dan on iki s\u0131\u00e7rama, tam bir geri turu tamamlar; saat evindedir</em>";
+}
+function loop(ts){
+  if(playing){const dt=Math.min(50,ts-last);t+=dt*(+$("#tspeed").value)**1.6*.02;
+    if(t>=Y1){t=Y1;playing=false;$("#tplay").textContent="oynat";}}
+  last=ts;
+  if(tlVisible)draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+$("#tplay").onclick=()=>{playing=!playing;$("#tplay").textContent=playing?"durdur":"oynat";
+  if(t>=Y1){t=Y0;playing=true;$("#tplay").textContent="durdur";}};
+$("#trew").onclick=()=>{t=Y0;draw();};
+cv.addEventListener("pointermove",e=>{if(e.buttons||e.type==="click"){
+  const rect=cv.getBoundingClientRect();
+  t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
+  t=Math.max(Y0,Math.min(Y1,t));}});
+cv.addEventListener("click",e=>{const rect=cv.getBoundingClientRect();
+  t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
+  t=Math.max(Y0,Math.min(Y1,t));});
+window.tlSeek=y=>{t=Math.max(Y0,Math.min(Y1,y));tlVisible=true;draw();};
+draw();
+})();
+
+/* ---- MACHINE STRIPS ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",RED="#ad4732",DIM="#655d4a",SKY="#35648c";
+const ease=u=>u<0?0:u>1?1:u*u*(3-2*u);
+function lbl(ctx,txt,x,y,c,sz,align){ctx.fillStyle=c;ctx.font=(sz||13)+"px Menlo";
+  ctx.textAlign=align||"center";ctx.fillText(txt,x,y);ctx.textAlign="center";}
+function road(ctx,W,y){ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(24,y);ctx.lineTo(W-24,y);ctx.stroke();}
+function mapper(W,a,b){return y=>24+(y-a)/(b-a)*(W-48);}
+function wheelM(ctx,x,y,r,c,pos){ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.4;ctx.stroke();
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(x+(r-5)*Math.cos(a),y+(r-5)*Math.sin(a),i===pos?3.4:1.5,0,7);
+    ctx.fillStyle=c;ctx.fill();}}
+function arch(ctx,x0,x1,y,h,c,w){ctx.strokeStyle=c;ctx.lineWidth=w||1.6;
+  ctx.beginPath();ctx.moveTo(x0,y);ctx.quadraticCurveTo((x0+x1)/2,y-h,x1,y);ctx.stroke();}
+function mk(id,dur,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let t0=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      if(t0===null)t0=ts;
+      const t=((ts-t0)/1000)%dur,W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,t);}
+    requestAnimationFrame(loop);})(0);
+}
+const LB=[1071,1310,1549,1788,2027],PB=[3,2,1,0,11];
+const LG=[];for(let y=-1070;y<=2026;y+=258)LG.push(y);
+
+/* I: 12 blocks of 79 + the 8 sliver */
+mk("m1",9,(ctx,W,H,t)=>{
+  const X=mapper(W,1040,2100),base=H-42;road(ctx,W,base);
+  lbl(ctx,"1071",X(1071),base+22,DIM);lbl(ctx,"2027",X(2027),base+22,DIM);
+  for(let i=0;i<12;i++){const u=ease((t-.35*i)/.5);if(u<=0)continue;
+    const a=1071+79*i;ctx.fillStyle="rgba(140,106,34,"+(.25+.06*(i%2))+")";
+    ctx.fillRect(X(a),base-20,(X(a+79)-X(a))*u,20);
+    ctx.strokeStyle="rgba(140,106,34,.5)";ctx.strokeRect(X(a),base-20,(X(a+79)-X(a))*u,20);}
+  if(t>.35*11+.6){const bl=.5+.5*Math.sin(t*5);
+    ctx.fillStyle="rgba(173,71,50,"+(.3+.5*bl)+")";
+    ctx.fillRect(X(2019),base-20,X(2027)-X(2019),20);
+    lbl(ctx,"12 \u00d7 79 = 948",X(1540),base-40,BRH,15);
+    lbl(ctx,"+ 8 artakalan",X(2010),base-40,RED,15);}
+});
+
+/* II: retrograde hops */
+mk("m2",10,(ctx,W,H,t)=>{
+  const X=mapper(W,1000,2110),base=H-46;road(ctx,W,base);
+  const k=Math.min(4,Math.floor(t/1.7)),f=Math.min(1,(t-1.7*k)/1.4);
+  LB.forEach((y,i)=>{const on=i<k||(i===k&&f<.02)||i<=k&&t>1.7*i;
+    ctx.beginPath();ctx.arc(X(y),base,i<=k?3.5:2,0,7);
+    ctx.fillStyle=i<=k?BR:"rgba(101,93,74,.35)";ctx.fill();
+    if(i<=k){lbl(ctx,y,X(y),base+20,BR,12);lbl(ctx,"konum "+PB[i],X(y),base+34,BRH,11);}});
+  let x,pos;
+  if(k>=4&&f>=1){x=X(2027);pos=11;lbl(ctx,"d\u00f6rt s\u0131\u00e7rama, d\u00f6rt geri kayma",W/2,26,BRH,14);}
+  else{const a=LB[k],b=LB[Math.min(k+1,4)];const u=ease(f);
+    x=X(a)+(X(b)-X(a))*u;pos=u>.96?PB[Math.min(k+1,4)]:PB[k];}
+  wheelM(ctx,x,base-24-Math.sin(Math.min(1,f)*Math.PI)*26,20,BR,pos);
+});
+
+/* III: 240 vs 239 race */
+mk("m3",10,(ctx,W,H,t)=>{
+  const X=mapper(W,1000,2160),y1=H*.3,y2=H*.76;
+  road(ctx,W,y1);road(ctx,W,y2);
+  lbl(ctx,"240\u2019ar ad\u0131m: hep evinde",150,y1-26,DIM,12,"left");
+  lbl(ctx,"benim 239\u2019um: kayar",150,y2-26,DIM,12,"left");
+  const A=[1071,1311,1551,1791,2031],B=LB;
+  const k=Math.min(4,Math.floor(t/1.5)),f=Math.min(1,(t-1.5*k)/1.2),u=ease(f);
+  function run(list,y,c,posf){
+    list.forEach((yy,i)=>{if(i<=k){ctx.beginPath();ctx.arc(X(yy),y,3,0,7);ctx.fillStyle=c;ctx.fill();
+      lbl(ctx,yy,X(yy),y+18,c,11);}});
+    let x;if(k>=4&&f>=1)x=X(list[4]);
+    else x=X(list[k])+(X(list[Math.min(k+1,4)])-X(list[k]))*u;
+    wheelM(ctx,x,y-16,13,c,posf(Math.min(k+(f>.96?1:0),4)));}
+  run(A,y1,DIM,()=>3);run(B,y2,BR,i=>PB[i]);
+  if(k>=4&&f>=1){ctx.strokeStyle=RED;ctx.setLineDash([3,3]);
+    ctx.beginPath();ctx.moveTo(X(2027),y2-34);ctx.lineTo(X(2031),y1+8);ctx.stroke();ctx.setLineDash([]);
+    lbl(ctx,"4 y\u0131l geride, 4 konum geri",X(2029)-20,H/2,RED,13,"right");}
+});
+
+/* IV: atoms — split the green hop, the brass refuses */
+mk("m4",11,(ctx,W,H,t)=>{
+  const X=mapper(W,950,1370),yG=H*.36,yB=H*.82;
+  road(ctx,W,yG);road(ctx,W,yB);
+  lbl(ctx,"bir ye\u015fil s\u0131\u00e7rama: 994 \u2192 1252",X(1123),yG+20,GR,12);
+  const jit=(t>7&&t<8.2)?Math.sin(t*45)*2.5:0;
+  lbl(ctx,"bir pirin\u00e7 s\u0131\u00e7rama: 1071 \u2192 1310",X(1190)+jit,yB+20,BR,12);
+  if(t<2.5)arch(ctx,X(994),X(1252),yG,44,GR,2);
+  else if(t<5){for(let i=0;i<2;i++)arch(ctx,X(994+129*i),X(994+129*(i+1)),yG,30,GR,1.8);
+    lbl(ctx,"2 \u00d7 129",X(1123),yG-44,GR,13);}
+  else{for(let i=0;i<6;i++)arch(ctx,X(994+43*i),X(994+43*(i+1)),yG,18,GR,1.6);
+    lbl(ctx,"2 \u00d7 3 \u00d7 43: atomlara kadar",X(1123),yG-34,GR,13);}
+  arch(ctx,X(1071)+jit,X(1310)+jit,yB,44,BR,2);
+  if(t>7)lbl(ctx,"239: b\u00f6l\u00fcnmez. bir atom.",X(1190),yB-52,RED,13);
+});
+
+/* V: 3096 vs 3097, the clock swap */
+mk("m5",13,(ctx,W,H,t)=>{
+  const X=mapper(W,-1180,2170),base=H*.62;road(ctx,W,base);
+  lbl(ctx,"M\u00d6 1071",X(-1070),base+22,GR,12);
+  const end=t<4?2026:t<5.2?2026+ease((t-4)/1.2):2027;
+  lbl(ctx,Math.round(end),X(end),base+22,end>2026.5?RED:GR,12);
+  ctx.beginPath();ctx.arc(X(end),base,3.5,0,7);ctx.fillStyle=end>2026.5?RED:GR;ctx.fill();
+  if(t<5.2){const n=Math.min(12,Math.floor(t/.3));
+    for(let i=0;i<n;i++)arch(ctx,X(-1070+258*i),X(-1070+258*(i+1)),base,26,GR,1.6);
+    if(n>=12)lbl(ctx,"12 \u00d7 258 = 3096: 12\u2019lik saat oturur",W/2,24,GR,14);}
+  else if(t<6.8){for(let i=0;i<12;i++)arch(ctx,X(-1070+258*i),X(-1070+258*(i+1)),base,26,RED,1.2);
+    lbl(ctx,"+1 y\u0131l: 12\u2019lik saat art\u0131k oturmaz",W/2,24,RED,14);}
+  else{const n=Math.min(19,Math.floor((t-6.8)/.22));
+    for(let i=0;i<n;i++)arch(ctx,X(-1070+163*i),X(-1070+163*(i+1)),base,20,SKY,1.5);
+    if(n>=19)lbl(ctx,"19 \u00d7 163 = 3097: 19\u2019luk saat devral\u0131r",W/2,24,SKY,14);}
+});
+
+/* VI: fold each road onto its centre */
+mk("m6",9,(ctx,W,H,t)=>{
+  const X=mapper(W,-1180,2170),yA=H*.32,yB=H*.78;
+  road(ctx,W,yA);road(ctx,W,yB);
+  LG.forEach(y=>{ctx.beginPath();ctx.arc(X(y),yA,2,0,7);ctx.fillStyle="rgba(42,116,92,.5)";ctx.fill();});
+  LB.forEach(y=>{ctx.beginPath();ctx.arc(X(y),yB,2,0,7);ctx.fillStyle="rgba(140,106,34,.5)";ctx.fill();});
+  lbl(ctx,"ye\u015fil yol: M\u00d6 1071 \u2192 2026",170,yA-24,GR,12,"left");
+  lbl(ctx,"pirin\u00e7 yol: 1071 \u2192 2027",170,yB-24,BR,12,"left");
+  const u=ease(t/3.2);
+  function fold(a,b,y,c,mid){
+    const xa=X(a)+(X(mid)-X(a))*u,xb=X(b)-(X(b)-X(mid))*u;
+    [xa,xb].forEach(x=>{ctx.beginPath();ctx.arc(x,y,5,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.5;ctx.stroke();});
+    if(u>=1){const bl=.5+.5*Math.sin(t*5);ctx.beginPath();ctx.arc(X(mid),y,7+3*bl,0,7);
+      ctx.strokeStyle=c;ctx.stroke();lbl(ctx,mid+": kendi ini\u015fi",X(mid),y-18,c,13);}}
+  fold(-1070,2026,yA,GR,478);fold(1071,2027,yB,BR,1549);
+});
+
+/* VII: 496 rebuilt from its parts */
+mk("m7",10,(ctx,W,H,t)=>{
+  const parts=[248,124,62,31,16,8,4,2,1],base=H*.6,x0=40,w=W-80;
+  ctx.strokeStyle="rgba(140,106,34,.5)";ctx.strokeRect(x0,base-24,w,24);
+  lbl(ctx,"yolun 496 y\u0131ll\u0131k par\u00e7as\u0131",x0,base-38,DIM,12,"left");
+  let acc=0;
+  parts.forEach((b,i)=>{const u=ease((t-.7*i)/.5);
+    if(u>0){const bw=b/496*w*u;
+      ctx.fillStyle=i%2?"rgba(140,106,34,.55)":"rgba(103,78,18,.55)";
+      ctx.fillRect(x0+acc/496*w,base-24,bw,24);
+      if(b>=16)lbl(ctx,b,x0+(acc+b/2)/496*w,base-8,"#f7f2e4",12);}
+    acc+=b;});
+  if(t>.7*8+.7)lbl(ctx,"1 + 2 + 4 + 8 + 16 + 31 + 62 + 124 + 248 = 496, tam kendisi",W/2,base+34,GR,14);
+});
+
+/* VIII: pass at one year, meet at 40984 */
+mk("m8",12,(ctx,W,H,t)=>{
+  const base=H*.62;
+  if(t<5){const X=mapper(W,1975,2075);road(ctx,W,base);
+    [2026,2027].forEach((y,i)=>{ctx.beginPath();ctx.arc(X(y),base,3.5,0,7);
+      ctx.fillStyle=i?BR:GR;ctx.fill();lbl(ctx,y,X(y),base+22,i?BR:GR,13);});
+    const u=ease(t/2.4);
+    wheelM(ctx,X(1980)+(X(2026)-X(1980))*u,base-22,16,GR,10);
+    wheelM(ctx,X(1984)+(X(2027)-X(1984))*Math.min(1,u*1.02),base-52,16,BR,11);
+    if(u>=1)lbl(ctx,"bir y\u0131l arayla. hi\u00e7 de\u011fmezler.",W/2,26,BRH,14);}
+  else{const u=ease((t-5)/4.5),yr=Math.round(2027+(40984-2027)*u);
+    const X=mapper(W,2000,41200);road(ctx,W,base);
+    lbl(ctx,yr.toLocaleString(),W/2,40,BRH,26);
+    wheelM(ctx,X(2026+(40984-2026)*u),base-16,11,GR,10);
+    wheelM(ctx,X(2027+(40984-2027)*u),base-40,11,BR,11);
+    if(u>=1){const bl=.5+.5*Math.sin(t*6);
+      ctx.beginPath();ctx.arc(X(40984),base-28,16+5*bl,0,7);ctx.strokeStyle=RED;ctx.stroke();
+      lbl(ctx,"40.984: ilk ger\u00e7ek bulu\u015fma, 163 ye\u015fil s\u0131\u00e7rama",W/2,H-14,RED,14);}}
+});
+
+/* IX: the pi sliver on the wheel */
+mk("m9",10,(ctx,W,H,t)=>{
+  const cx=Math.min(120,W*.18),cy=H*.55,r=Math.min(58,H*.38);
+  ctx.beginPath();ctx.arc(cx,cy,r,0,7);ctx.strokeStyle="rgba(140,106,34,.45)";ctx.stroke();
+  const a45=-Math.PI/4,tilt=Math.atan(1/5);
+  ctx.strokeStyle=SKY;ctx.setLineDash([3,4]);
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(a45),cy+r*Math.sin(a45));ctx.stroke();ctx.setLineDash([]);
+  lbl(ctx,"45°",cx+(r+16)*Math.cos(a45),cy+(r+16)*Math.sin(a45),SKY,12);
+  const k=Math.min(4,Math.floor(t/1.3)),f=Math.min(1,(t-1.3*k)/0.9);
+  const th=(k+(k<4?ease(f):0))*tilt* (k<4?1:1);
+  const ang=-(Math.min(4,k+(k<4?ease(f):0)))*tilt;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.2;
+  ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+r*Math.cos(ang),cy+r*Math.sin(ang));ctx.stroke();
+  lbl(ctx,"e\u011fim "+Math.min(4,k+(f>=1?1:0))+" / 4",cx,cy+r+18,DIM,12);
+  if(k>=4){const bl=.5+.5*Math.sin(t*5);
+    ctx.fillStyle="rgba(173,71,50,"+(.4+.4*bl)+")";
+    ctx.beginPath();ctx.moveTo(cx,cy);
+    ctx.arc(cx,cy,r,a45,-4*tilt,true);ctx.closePath();ctx.fill();
+    // zoom inset
+    const zx=W*.62,zy=H*.5,zr=Math.min(70,H*.4);
+    ctx.strokeStyle="rgba(101,93,74,.4)";ctx.beginPath();ctx.arc(zx,zy,zr,0,7);ctx.stroke();
+    ctx.strokeStyle=SKY;ctx.setLineDash([3,4]);
+    ctx.beginPath();ctx.moveTo(zx-zr,zy+30);ctx.lineTo(zx+zr,zy+30);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle="rgba(173,71,50,.55)";
+    ctx.beginPath();ctx.moveTo(zx-zr,zy+30);ctx.lineTo(zx+zr,zy+30);ctx.lineTo(zx+zr,zy-30);ctx.closePath();ctx.fill();
+    lbl(ctx,"ta\u015fma, b\u00fcy\u00fct\u00fclm\u00fc\u015f: arctan(1/239)",zx,zy+58,RED,13);
+    lbl(ctx,"benim 239\u2019um",zx,zy-44,BRH,14);}
+});
+})();
+
+
+/* ---- THE WATCH ---- */
+(()=>{
+const cv=document.getElementById("watchcv");if(!cv)return;
+const ctx=cv.getContext("2d");const sec=cv.closest("section");
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",DIM="#655d4a",RED="#ad4732",PAPER="#f7f2e4";
+const fmtW=y=>y<=0?"M\u00d6 "+Math.round(1-y):""+Math.round(y);
+const LBw=[1071,1310,1549,1788,2027];
+const LGw=[];for(let y=-1070;y<=2026;y+=258)LGw.push(y);
+function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+  ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+window.addEventListener("resize",rs);rs();
+let T=-1150,wind=1,last=performance.now(),handPos=3,handA=3,gA=0,gAt=0,bA=0,bAt=0,floats=[];
+let crownBox=null;
+cv.addEventListener("click",e=>{
+  const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
+  if(crownBox&&x>crownBox[0]-8&&x<crownBox[0]+crownBox[2]+8&&y>crownBox[1]-8&&y<crownBox[1]+crownBox[3]+8){
+    wind=wind===1?4:1;
+    document.getElementById("watchcap").textContent=wind===4?"kuruldu: y\u0131llar d\u00f6rt kat h\u0131zl\u0131":"kurma b\u0131rak\u0131ld\u0131: normal ak\u0131\u015f";
+  }});
+function gear(x,y,r,color,ang,alpha,teethLabel){
+  ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.rotate(ang);
+  ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.strokeStyle=color;ctx.lineWidth=1.6;ctx.stroke();
+  ctx.beginPath();ctx.arc(0,0,r*.55,0,7);ctx.lineWidth=.7;ctx.stroke();
+  for(let i=0;i<48;i++){const a=i/48*2*Math.PI;
+    ctx.beginPath();ctx.moveTo(r*Math.cos(a),r*Math.sin(a));
+    ctx.lineTo((r+7)*Math.cos(a),(r+7)*Math.sin(a));
+    ctx.lineWidth=i===0?2.6:1;ctx.globalAlpha=alpha*(i===0?1:.55);ctx.stroke();}
+  ctx.globalAlpha=alpha;
+  for(let k=0;k<4;k++){const a=k*Math.PI/2+Math.PI/4;
+    ctx.beginPath();ctx.moveTo(r*.15*Math.cos(a),r*.15*Math.sin(a));
+    ctx.lineTo(r*.52*Math.cos(a),r*.52*Math.sin(a));ctx.lineWidth=3;ctx.stroke();}
+  ctx.beginPath();ctx.arc(0,0,3,0,7);ctx.fillStyle=color;ctx.fill();
+  ctx.restore();
+  ctx.fillStyle=color;ctx.globalAlpha=alpha;ctx.font="13px Menlo";ctx.textAlign="center";
+  ctx.fillText(teethLabel,x,y+r+22);ctx.globalAlpha=1;
+}
+function loop(ts){
+  const dt=Math.min(.06,(ts-last)/1000);last=ts;
+  if(!sec.classList.contains("vis")){requestAnimationFrame(loop);return;}
+  const W=cv.clientWidth,H=cv.clientHeight,cx=W/2,cy=H/2+14,R=Math.min(W,H)/2-46;
+  const prev=T;T+=dt*66*wind;
+  if(T>2100){T=-1150;handPos=3;handA=3;gA=gAt=bA=bAt=0;floats=[];}
+  LBw.forEach((y,i)=>{if(prev<y&&T>=y){gAt+=2*Math.PI/48*3;handPos=PBw(i);
+    floats.push({t:fmtW(y)+" \u00b7 konum "+PBw(i),x:cx-R*.34,y:cy+R*.28,age:0,c:BRH});}});
+  LGw.forEach(y=>{if(prev<y&&T>=y){bAt+=2*Math.PI/48*3;
+    floats.push({t:fmtW(y),x:cx+R*.36,y:cy+R*.26,age:0,c:GR});}});
+  function PBw(i){return ((3-i)%12+12)%12;}
+  gA+=(gAt-gA)*Math.min(1,dt*7);bA+=(bAt-bA)*Math.min(1,dt*7);
+  handA+=(handPos-handA-Math.round((handA-handPos)/12)*12)*Math.min(1,dt*6)*(0+1);
+  // simpler: ease handA toward handPos on shortest path
+  ctx.clearRect(0,0,W,H);
+  // case
+  ctx.beginPath();ctx.arc(cx,cy,R+16,0,7);ctx.strokeStyle="rgba(140,106,34,.75)";ctx.lineWidth=3;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+8,0,7);ctx.lineWidth=1;ctx.stroke();
+  // guilloche
+  for(let r=R-6;r>40;r-=15){ctx.beginPath();ctx.arc(cx,cy,r,0,7);
+    ctx.strokeStyle="rgba(140,106,34,.08)";ctx.lineWidth=1;ctx.stroke();}
+  // crown
+  crownBox=[cx-11,cy-R-42,22,24];
+  ctx.fillStyle="rgba(140,106,34,.85)";
+  ctx.fillRect(crownBox[0],crownBox[1],crownBox[2],crownBox[3]);
+  for(let i=0;i<3;i++){ctx.strokeStyle=PAPER;ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(crownBox[0]+5+i*6,crownBox[1]+3);ctx.lineTo(crownBox[0]+5+i*6,crownBox[1]+21);ctx.stroke();}
+  // chapter ring
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    const x=cx+(R-16)*Math.cos(a),y=cy+(R-16)*Math.sin(a);
+    ctx.fillStyle=i===handPos?BRH:"rgba(101,93,74,.6)";ctx.font=(i===handPos?"15px":"12px")+" Menlo";
+    ctx.textAlign="center";ctx.fillText(i,x,y+4);}
+  // balance wheel (the oscillator)
+  const bx=cx,by=cy-R*.42,br=R*.22,osc=.7*Math.sin(ts/1000*5);
+  ctx.save();ctx.translate(bx,by);ctx.rotate(osc);
+  ctx.beginPath();ctx.arc(0,0,br,0,7);ctx.strokeStyle=DIM;ctx.lineWidth=2.2;ctx.stroke();
+  for(let k=0;k<2;k++){const a=k*Math.PI;
+    ctx.beginPath();ctx.moveTo(br*.2*Math.cos(a),br*.2*Math.sin(a));
+    ctx.lineTo(br*Math.cos(a),br*Math.sin(a));ctx.lineWidth=2;ctx.stroke();}
+  ctx.restore();
+  for(let k=0;k<3;k++){ctx.beginPath();
+    ctx.arc(bx,by,4+k*4,k*2+osc,k*2+osc+4.5);ctx.strokeStyle="rgba(101,93,74,.5)";ctx.lineWidth=1;ctx.stroke();}
+  ctx.fillStyle=DIM;ctx.font="11px Menlo";ctx.textAlign="center";
+  ctx.fillText("rakkas",bx,by-br-10);
+  // gears
+  const brassAlive=T>=1071;
+  gear(cx-R*.34,cy+R*.28,R*.3,BR,gA,brassAlive?1:.3,"239");
+  gear(cx+R*.36,cy+R*.26,R*.33,GR,-bA,1,"258");
+  if(!brassAlive){ctx.fillStyle="rgba(140,106,34,.7)";ctx.font="11px Menlo";
+    ctx.fillText("1071\u2019i bekler",cx-R*.34,cy+R*.28-R*.3-14);}
+  // retrograde hand
+  const ha=handA/12*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.6;
+  ctx.beginPath();ctx.moveTo(cx-18*Math.cos(ha),cy-18*Math.sin(ha));
+  ctx.lineTo(cx+(R-34)*Math.cos(ha),cy+(R-34)*Math.sin(ha));ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,4.5,0,7);ctx.fillStyle=BRH;ctx.fill();
+  // year aperture
+  const yw=112;
+  ctx.fillStyle="rgba(255,252,243,.92)";ctx.fillRect(cx-yw/2,cy+R*.62,yw,30);
+  ctx.strokeStyle="rgba(140,106,34,.6)";ctx.lineWidth=1;ctx.strokeRect(cx-yw/2,cy+R*.62,yw,30);
+  ctx.fillStyle=BRH;ctx.font="16px Menlo";ctx.fillText(fmtW(T),cx,cy+R*.62+21);
+  // floats
+  floats=floats.filter(f=>f.age<1.8);
+  floats.forEach(f=>{f.age+=dt;ctx.globalAlpha=Math.max(0,1-f.age/1.8);
+    ctx.fillStyle=f.c;ctx.font="13px Menlo";ctx.fillText(f.t,f.x,f.y-38-f.age*16);ctx.globalAlpha=1;});
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+})();
+
+
+/* ---- REFERENCE WATCHES ON THE MOVEMENTS ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",RED="#ad4732",DIMc="#655d4a";
+function lblw(ctx,t,x,y,c,sz){ctx.fillStyle=c;ctx.font=(sz||12)+"px Menlo";ctx.textAlign="center";ctx.fillText(t,x,y);}
+function mkW(id,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let last=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      const dt=last===null?0:Math.min(.06,(ts-last)/1000);last=ts;
+      const W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,dt,ts/1000);}
+    requestAnimationFrame(loop);})(0);
+}
+function drawWatch(ctx,W,H,tt,hl,handPos){
+  const cx=W/2,cy=H/2+5,R=Math.min(W,H)/2-24;
+  const on=k=>{
+    if(hl==="gears")return k==="brassgear"||k==="greengear";
+    return k===hl;};
+  const al=k=>{ctx.globalAlpha=on(k)?1:.15;};
+  // case + crown
+  al("case");
+  ctx.beginPath();ctx.arc(cx,cy,R+9,0,7);ctx.strokeStyle="rgba(140,106,34,.85)";ctx.lineWidth=2.2;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R+3.5,0,7);ctx.lineWidth=.8;ctx.stroke();
+  ctx.fillStyle="rgba(140,106,34,.85)";ctx.fillRect(cx-5.5,cy-R-21,11,12);
+  // chapter ring
+  al("chapter");
+  for(let i=0;i<12;i++){const a=i/12*2*Math.PI-Math.PI/2;
+    ctx.beginPath();ctx.arc(cx+(R-8)*Math.cos(a),cy+(R-8)*Math.sin(a),on("chapter")?2.6:1.7,0,7);
+    ctx.fillStyle=on("chapter")?BRH:DIMc;ctx.fill();}
+  // balance
+  al("balance");
+  const bx=cx,by=cy-R*.42,br=R*.21,osc=.7*Math.sin(tt*5);
+  ctx.save();ctx.translate(bx,by);ctx.rotate(osc);
+  ctx.beginPath();ctx.arc(0,0,br,0,7);ctx.strokeStyle=DIMc;ctx.lineWidth=2;ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-br,0);ctx.lineTo(br,0);ctx.stroke();ctx.restore();
+  // gears
+  function gear(x,y,r,c,ang,k){al(k);ctx.save();ctx.translate(x,y);ctx.rotate(ang);
+    ctx.beginPath();ctx.arc(0,0,r,0,7);ctx.strokeStyle=c;ctx.lineWidth=1.3;ctx.stroke();
+    for(let i=0;i<22;i++){const a=i/22*2*Math.PI;
+      ctx.beginPath();ctx.moveTo(r*Math.cos(a),r*Math.sin(a));
+      ctx.lineTo((r+4.5)*Math.cos(a),(r+4.5)*Math.sin(a));ctx.lineWidth=i===0?2:.8;ctx.stroke();}
+    ctx.beginPath();ctx.arc(0,0,1.8,0,7);ctx.fillStyle=c;ctx.fill();ctx.restore();}
+  gear(cx-R*.33,cy+R*.3,R*.27,BR,tt*.5,"brassgear");
+  gear(cx+R*.36,cy+R*.28,R*.3,GR,-tt*.5*239/258,"greengear");
+  // hand
+  al("hand");
+  const ha=handPos/12*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BRH;ctx.lineWidth=2.1;
+  ctx.beginPath();ctx.moveTo(cx-11*Math.cos(ha),cy-11*Math.sin(ha));
+  ctx.lineTo(cx+(R-18)*Math.cos(ha),cy+(R-18)*Math.sin(ha));ctx.stroke();
+  // axle
+  al("axle");
+  ctx.beginPath();ctx.arc(cx,cy,on("axle")?4.5:2.8,0,7);ctx.fillStyle=BRH;ctx.fill();
+  // aperture
+  al("aperture");
+  ctx.fillStyle="rgba(255,252,243,.95)";ctx.fillRect(cx-24,cy+R*.56,48,17);
+  ctx.strokeStyle="rgba(140,106,34,.7)";ctx.lineWidth=1;ctx.strokeRect(cx-24,cy+R*.56,48,17);
+  ctx.fillStyle=BRH;ctx.font="11px Menlo";ctx.textAlign="center";ctx.fillText("2027",cx,cy+R*.56+12.5);
+  // halo
+  ctx.globalAlpha=.5+.45*Math.sin(tt*4);
+  ctx.strokeStyle=RED;ctx.lineWidth=1.5;
+  let hx=cx,hy=cy,hr=R*.5;
+  if(hl==="balance"){hx=bx;hy=by;hr=br+8;}
+  else if(hl==="gears"){hy=cy+R*.29;hr=R*.6;}
+  else if(hl==="brassgear"){hx=cx-R*.33;hy=cy+R*.3;hr=R*.27+11;}
+  else if(hl==="greengear"){hx=cx+R*.36;hy=cy+R*.28;hr=R*.3+11;}
+  else if(hl==="aperture"){hy=cy+R*.56+8;hr=32;}
+  else if(hl==="axle"){hr=13;}
+  else if(hl==="case"){hr=R+15;}
+  else if(hl==="chapter"){hr=R-8;}
+  ctx.beginPath();ctx.arc(hx,hy,hr,0,7);ctx.stroke();
+  ctx.globalAlpha=1;
+}
+let pos=3,acc=0;
+const MAP={wm1:"chapter",wm2:"hand",wm3:"brassgear",wm4:"greengear",wm5:"aperture",
+           wm6:"axle",wm7:"case",wm8:"gears",wm9:"balance",
+           ew1:"gears",ew2:"balance",ew3:"hand",ew4:"aperture"};
+Object.entries(MAP).forEach(([id,key])=>{
+  mkW(id,(ctx,W,H,dt,tt)=>{
+    if(key==="hand"){acc+=dt;if(acc>1.2){acc=0;pos=((pos-1)%12+12)%12;}}
+    drawWatch(ctx,W,H,tt,key,key==="hand"?pos:3);
+  });
+});
+})();
+
+
+/* ---- THE SKY ENGINES ---- */
+(()=>{
+const BR="#8c6a22",BRH="#674e12",GR="#2a745c",SKYC="#35648c",RED="#ad4732",DIM="#655d4a",DARK="#3a3426";
+const SYN=29.530588,TROP=365.2422;
+function mk(id,scene){
+  const cv=document.getElementById(id);if(!cv)return;
+  const ctx=cv.getContext("2d");const sec=cv.closest("section");let last=null;
+  function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
+    ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
+  window.addEventListener("resize",rs);rs();
+  (function loop(ts){
+    if(sec.classList.contains("vis")){
+      const dt=last===null?0:Math.min(.06,(ts-last)/1000);last=ts;
+      const W=cv.clientWidth,H=cv.clientHeight;
+      ctx.clearRect(0,0,W,H);scene(ctx,W,H,dt,ts/1000);}
+    requestAnimationFrame(loop);})(0);
+}
+function lbl(ctx,t,x,y,c,sz,al){ctx.fillStyle=c;ctx.font=(sz||13)+"px Menlo";
+  ctx.textAlign=al||"center";ctx.fillText(t,x,y);ctx.textAlign="center";}
+function drawMoon(ctx,x,y,r,p){
+  ctx.save();
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fillStyle="#efe4c8";ctx.fill();
+  const waxing=p<.5,c=Math.cos(2*Math.PI*p);
+  ctx.beginPath();
+  ctx.arc(x,y,r,Math.PI/2,-Math.PI/2,!waxing);
+  ctx.ellipse(x,y,r*Math.abs(c),r,0,-Math.PI/2,Math.PI/2,waxing? c<0 : c>0);
+  ctx.fillStyle=DARK;ctx.fill();
+  ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.strokeStyle="rgba(101,93,74,.6)";ctx.lineWidth=1;ctx.stroke();
+  ctx.restore();
+}
+/* Engine I: phase engine */
+(()=>{
+let days=0;
+mk("ec1",(ctx,W,H,dt)=>{
+  days+=dt*(+$("#esp1").value);
+  const p=(days%SYN)/SYN, yr=(days%TROP)/TROP;
+  const mx=W*.24,my=H/2,mr=Math.min(86,H*.3);
+  drawMoon(ctx,mx,my,mr,p);
+  const names=["yeni ay","hilal","ilk d\u00f6rd\u00fcn","\u015fi\u015fkin ay","dolunay","k\u00fc\u00e7\u00fclen \u015fi\u015fkin","son d\u00f6rd\u00fcn","k\u00fc\u00e7\u00fclen hilal"];
+  lbl(ctx,names[Math.floor(((p+1/16)%1)*8)],mx,my+mr+26,DIM,13);
+  // dial
+  const dx=W*.66,dy=H/2,dr=Math.min(100,H*.36);
+  ctx.beginPath();ctx.arc(dx,dy,dr,0,7);ctx.strokeStyle="rgba(140,106,34,.4)";ctx.lineWidth=1;ctx.stroke();
+  ctx.beginPath();ctx.arc(dx,dy,dr*.62,0,7);ctx.strokeStyle="rgba(42,116,92,.35)";ctx.stroke();
+  const sa=yr*2*Math.PI-Math.PI/2, ma=(days%SYN)/SYN*2*Math.PI-Math.PI/2;
+  ctx.strokeStyle=BR;ctx.lineWidth=2.6;
+  ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx+dr*Math.cos(sa),dy+dr*Math.sin(sa));ctx.stroke();
+  ctx.strokeStyle=GR;ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(dx,dy);ctx.lineTo(dx+dr*.62*Math.cos(ma),dy+dr*.62*Math.sin(ma));ctx.stroke();
+  ctx.beginPath();ctx.arc(dx,dy,3.5,0,7);ctx.fillStyle=BRH;ctx.fill();
+  lbl(ctx,"g\u00fcne\u015f / y\u0131l",dx+dr+14,dy-6,BR,12,"left");
+  lbl(ctx,"kamer / ay",dx,dy+dr*.62+20,GR,12);
+  $("#er1").innerHTML="y\u0131l\u0131n <b>"+Math.floor(days%TROP)+"</b>. g\u00fcn\u00fc &#183; kamerin <b>"+
+    Math.floor(days%SYN)+"</b>. g\u00fcn\u00fc &#183; y\u0131l <b>"+Math.floor(days/TROP)+"</b>";
+});
+})();
+
+/* Engine II: the nineteen */
+(()=>{
+let t19=0,running=0,cycles=0,drift=0,fast=false;
+$("#eb19").onclick=()=>{running=1;fast=false;};
+$("#eb163").onclick=()=>{running=1;fast=true;};
+mk("ec2",(ctx,W,H,dt)=>{
+  const cx=W*.38,cy=H/2,R=Math.min(105,H*.38);
+  if(running){t19+=dt*(fast?9:2.4);
+    if(t19>=19){t19=0;cycles++;drift+=0.0865;
+      if(!fast||cycles>=163){running=fast&&cycles<163?1:0;}
+      if(fast&&cycles>=163){running=0;}
+      if(!fast)running=0;}}
+  const yrs=t19, moons=t19/19*235;
+  ctx.beginPath();ctx.arc(cx,cy,R,-Math.PI/2,-Math.PI/2+yrs/19*2*Math.PI);
+  ctx.strokeStyle=BR;ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R*.72,-Math.PI/2,-Math.PI/2+(moons%235)/235*2*Math.PI);
+  ctx.strokeStyle=GR;ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R,0,7);ctx.strokeStyle="rgba(140,106,34,.18)";ctx.lineWidth=7;ctx.stroke();
+  ctx.beginPath();ctx.arc(cx,cy,R*.72,0,7);ctx.strokeStyle="rgba(42,116,92,.16)";ctx.stroke();
+  lbl(ctx,Math.floor(yrs)+" / 19 y\u0131l",cx,cy-8,BRH,15);
+  lbl(ctx,Math.floor(moons)+" / 235 kamer",cx,cy+16,GR,15);
+  // drift gauge
+  const gx=W*.72,gw=W*.2,gy=H/2;
+  ctx.strokeStyle="rgba(101,93,74,.4)";ctx.strokeRect(gx,gy-12,gw,24);
+  ctx.fillStyle="rgba(173,71,50,.55)";ctx.fillRect(gx,gy-12,gw*Math.min(1,drift/14.1),24);
+  lbl(ctx,"s\u0131z\u0131nt\u0131: "+drift.toFixed(2)+" g\u00fcn",gx+gw/2,gy-24,RED,13);
+  lbl(ctx,"tamamlanan devir: "+cycles+(cycles>=163?"  : tutulma":""),gx+gw/2,gy+34,DIM,13);
+  if(cycles>=163)$("#ecap2").innerHTML="<b>163 devir, defterin tutulmaya sayd\u0131\u011f\u0131:</b> halkalar 163 kez birlikte kapand\u0131 ve s\u0131z\u0131nt\u0131 on d\u00f6rt g\u00fcne b\u00fcy\u00fcd\u00fc. Say\u0131larda kesin; ay \u0131\u015f\u0131\u011f\u0131nda gev\u015fek.";
+});
+})();
+
+/* Engine III: saros chain */
+(()=>{
+const CH=[[1901,"18 May\u0131s 1901"],[1919,"29 May\u0131s 1919 \u2014 Eddington"],[1937,"8 Haziran 1937"],[1955,"20 Haziran 1955"],
+[1973,"30 Haziran 1973"],[1991,"11 Temmuz 1991"],[2009,"22 Temmuz 2009"],[2027,"2 A\u011fustos 2027 \u2014 Luxor"]];
+mk("ec3",(ctx,W,H,dt,tt)=>{
+  const t=(tt%14);
+  const X=y=>40+(y-1894)/(2040-1894)*(W-80),base=H*.52;
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.beginPath();ctx.moveTo(30,base);ctx.lineTo(W-30,base);ctx.stroke();
+  const k=Math.min(7,Math.floor(t/1.5)),f=Math.min(1,(t-1.5*k)/1.1);
+  CH.forEach((c,i)=>{if(i<=k){
+    ctx.beginPath();ctx.arc(X(c[0]),base,i===1||i===7?4.5:3,0,7);
+    ctx.fillStyle=i===1||i===7?RED:BR;ctx.fill();
+    ctx.save();ctx.translate(X(c[0]),base+(i%2?24:-16));ctx.rotate(0);
+    lbl(ctx,c[1],0,0,i===1||i===7?RED:BRH,i===1||i===7?13:11);ctx.restore();}});
+  if(k<7){const a=CH[k][0],b=CH[Math.min(k+1,7)][0],u=f*f*(3-2*f);
+    const x=X(a)+(X(b)-X(a))*u;
+    drawMoon(ctx,x,base-46-Math.sin(f*Math.PI)*26,15,0); // new moon carries the shadow
+    lbl(ctx,"saros: +18 y\u0131l 11 g\u00fcn",x,base-84,DIM,11);}
+  else{
+    // metonic sibling arc
+    ctx.strokeStyle=GR;ctx.lineWidth=1.8;
+    ctx.beginPath();ctx.moveTo(X(2008),base+40);
+    ctx.quadraticCurveTo((X(2008)+X(2027))/2,base+86,X(2027),base+40);ctx.stroke();
+    ctx.beginPath();ctx.arc(X(2008),base+40,3.5,0,7);ctx.fillStyle=GR;ctx.fill();
+    ctx.beginPath();ctx.arc(X(2027),base+40,3.5,0,7);ctx.fill();
+    lbl(ctx,"1 A\u011fustos 2008",X(2008),base+62,GR,12);
+    lbl(ctx,"metonik karde\u015f: +19 y\u0131l 1 g\u00fcn",(X(2008)+X(2027))/2,base+98,GR,13);}
+});
+})();
+
+/* The verdict */
+(()=>{
+mk("ec4",(ctx,W,H,dt,tt)=>{
+  const t=(tt%16);
+  const X=y=>30+(y+1070)/(2027+1070)*(W-60),base=H*.42;
+  ctx.strokeStyle="rgba(140,106,34,.4)";ctx.beginPath();ctx.moveTo(24,base);ctx.lineTo(W-24,base);ctx.stroke();
+  lbl(ctx,"1071 BC",X(-1070),base+20,DIM,12);lbl(ctx,"2027",X(2027),base+20,DIM,12);
+  const prog=Math.min(1,t/10);
+  const n=Math.floor(prog*163);
+  for(let i=0;i<=n;i++){const y=-1070+19*i;
+    ctx.fillStyle=i%2?"rgba(53,100,140,.5)":"rgba(53,100,140,.8)";
+    ctx.fillRect(X(y),base-8,1,8);}
+  lbl(ctx,n+" of 163 metonic ticks",W/2,base-26,SKYC,14);
+  // green wheel hops beneath
+  for(let i=0;i<13;i++){const y=-1070+258*i;
+    if(prog*3097>=(258*i)){ctx.beginPath();ctx.arc(X(y),base+34,3,0,7);ctx.fillStyle=GR;ctx.fill();}}
+  lbl(ctx,"my green wheel, 12 hops of 258",W/2,base+58,GR,12);
+  // drift gauge
+  const gw=W*.5,gx=W/2-gw/2,gy=H-46;
+  ctx.strokeStyle="rgba(101,93,74,.4)";ctx.strokeRect(gx,gy-10,gw,20);
+  ctx.fillStyle="rgba(173,71,50,.55)";ctx.fillRect(gx,gy-10,gw*prog,20);
+  lbl(ctx,"the sky's leak: "+(prog*14.1).toFixed(1)+" of 14.1 days",W/2,gy-20,RED,13);
+  if(prog>=1){drawMoon(ctx,X(2027),base-38,13,0);
+    lbl(ctx,"the shadow arrives",X(2027),base-64,BRH,12);}
+});
+})();
+
+
+})();
+
+</script>
+</body>
+</html>
