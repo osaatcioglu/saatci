@@ -637,7 +637,7 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{
     const i=sections.indexOf(e.target);
     [...nav.children].forEach((d,j)=>d.classList.toggle("on",j===i));
     if(e.target.id==="finale") tlVisible=true; else if(tlVisible && !e.isIntersecting){} }
-}),{threshold:.12});
+}),{threshold:0});
 sections.forEach(s=>io.observe(s));
 
 /* ---- title clock ornament ---- */
@@ -840,6 +840,8 @@ $$("#s8 .ctl button[data-g]").forEach(b=>b.onclick=()=>{
 $("#gspin").onclick=()=>{spin=!spin;$("#gspin").textContent=spin?"stop":"spin";
   if(spin)loop();else cancelAnimationFrame(raf);};
 render();
+new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!spin){
+  spin=true;$("#gspin").textContent="stop";loop();o.disconnect();}});},{threshold:.1}).observe($("#s8"));
 })();
 
 /* ---- IX sliver ---- */
@@ -1020,6 +1022,8 @@ requestAnimationFrame(loop);
 $("#tplay").onclick=()=>{playing=!playing;$("#tplay").textContent=playing?"pause":"play";
   if(t>=Y1){t=Y0;playing=true;$("#tplay").textContent="pause";}};
 $("#trew").onclick=()=>{t=Y0;draw();};
+new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!playing&&t<Y1){
+  playing=true;$("#tplay").textContent="pause";o.disconnect();}});},{threshold:.1}).observe($("#finale"));
 cv.addEventListener("pointermove",e=>{if(e.buttons||e.type==="click"){
   const rect=cv.getBoundingClientRect();
   t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
@@ -1233,13 +1237,13 @@ mk("m9",10,(ctx,W,H,t)=>{
 const cv=document.getElementById("watchcv");if(!cv)return;
 const ctx=cv.getContext("2d");const sec=cv.closest("section");
 const BR="#8c6a22",BRH="#674e12",GR="#2a745c",DIM="#655d4a",RED="#ad4732",PAPER="#f7f2e4";
-const fmtW=y=>y<=0?(1-y)+" BC":""+Math.round(y);
+const fmtW=y=>y<=0?Math.round(1-y)+" BC":""+Math.round(y);
 const LBw=[1071,1310,1549,1788,2027];
 const LGw=[];for(let y=-1070;y<=2026;y+=258)LGw.push(y);
 function rs(){cv.width=cv.clientWidth*devicePixelRatio;cv.height=cv.clientHeight*devicePixelRatio;
   ctx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0);}
 window.addEventListener("resize",rs);rs();
-let T=-1150,wind=1,last=performance.now(),handPos=3,handA=3,gA=0,gAt=0,bA=0,bAt=0,floats=[];
+let T=1070.9,wind=1,last=performance.now(),handPos=3,handA=3,gA=0,gAt=0,bA=0,bAt=0,floats=[];
 let crownBox=null;
 cv.addEventListener("click",e=>{
   const r=cv.getBoundingClientRect(),x=e.clientX-r.left,y=e.clientY-r.top;
@@ -1269,14 +1273,14 @@ function loop(ts){
   if(!sec.classList.contains("vis")){requestAnimationFrame(loop);return;}
   const W=cv.clientWidth,H=cv.clientHeight,cx=W/2,cy=H/2+14,R=Math.min(W,H)/2-46;
   const prev=T;T+=dt*66*wind;
-  if(T>2100){T=-1150;handPos=3;handA=3;gA=gAt=bA=bAt=0;floats=[];}
+  if(T>2160){T=1070.9;handPos=3;handA=3;gA=gAt=bA=bAt=0;floats=[];}
   LBw.forEach((y,i)=>{if(prev<y&&T>=y){gAt+=2*Math.PI/48*3;handPos=PBw(i);
     floats.push({t:fmtW(y)+" · pos "+PBw(i),x:cx-R*.34,y:cy+R*.28,age:0,c:BRH});}});
   LGw.forEach(y=>{if(prev<y&&T>=y){bAt+=2*Math.PI/48*3;
     floats.push({t:fmtW(y),x:cx+R*.36,y:cy+R*.26,age:0,c:GR});}});
   function PBw(i){return ((3-i)%12+12)%12;}
   gA+=(gAt-gA)*Math.min(1,dt*7);bA+=(bAt-bA)*Math.min(1,dt*7);
-  handA+=(handPos-handA-Math.round((handA-handPos)/12)*12)*Math.min(1,dt*6)*(0+1);
+  handA+=(handPos-handA-Math.round((handPos-handA)/12)*12)*Math.min(1,dt*6);
   // simpler: ease handA toward handPos on shortest path
   ctx.clearRect(0,0,W,H);
   // case
@@ -1487,6 +1491,8 @@ mk("ec1",(ctx,W,H,dt)=>{
 let t19=0,running=0,cycles=0,drift=0,fast=false;
 $("#eb19").onclick=()=>{running=1;fast=false;};
 $("#eb163").onclick=()=>{running=1;fast=true;};
+new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!running){
+  running=1;fast=false;o.disconnect();}});},{threshold:.1}).observe($("#e2"));
 mk("ec2",(ctx,W,H,dt)=>{
   const cx=W*.38,cy=H/2,R=Math.min(105,H*.38);
   if(running){t19+=dt*(fast?9:2.4);
