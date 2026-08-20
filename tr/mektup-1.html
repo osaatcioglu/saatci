@@ -699,7 +699,7 @@ const io=new IntersectionObserver(es=>es.forEach(e=>{
     const i=sections.indexOf(e.target);
     [...nav.children].forEach((d,j)=>d.classList.toggle("on",j===i));
     if(e.target.id==="finale") tlVisible=true; else if(tlVisible && !e.isIntersecting){} }
-}),{threshold:.12});
+}),{threshold:0});
 sections.forEach(s=>io.observe(s));
 
 /* ---- title clock ornament ---- */
@@ -903,7 +903,7 @@ $("#gspin").onclick=()=>{spin=!spin;$("#gspin").textContent=spin?"durdur":"d\u00
   if(spin)loop();else cancelAnimationFrame(raf);};
 render();
 new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!spin){
-  spin=true;$("#gspin").textContent="durdur";loop();o.disconnect();}});},{threshold:.35}).observe($("#s8"));
+  spin=true;$("#gspin").textContent="durdur";loop();o.disconnect();}});},{threshold:.1}).observe($("#s8"));
 })();
 
 /* ---- IX sliver ---- */
@@ -1085,7 +1085,7 @@ $("#tplay").onclick=()=>{playing=!playing;$("#tplay").textContent=playing?"durdu
   if(t>=Y1){t=Y0;playing=true;$("#tplay").textContent="durdur";}};
 $("#trew").onclick=()=>{t=Y0;draw();};
 new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!playing&&t<Y1){
-  playing=true;$("#tplay").textContent="durdur";o.disconnect();}});},{threshold:.35}).observe($("#finale"));
+  playing=true;$("#tplay").textContent="durdur";o.disconnect();}});},{threshold:.1}).observe($("#finale"));
 cv.addEventListener("pointermove",e=>{if(e.buttons||e.type==="click"){
   const rect=cv.getBoundingClientRect();
   t=Y0+((e.clientX-rect.left-40)/(cv.clientWidth-80))*(Y1-Y0);
@@ -1554,7 +1554,7 @@ let t19=0,running=0,cycles=0,drift=0,fast=false;
 $("#eb19").onclick=()=>{running=1;fast=false;};
 $("#eb163").onclick=()=>{running=1;fast=true;};
 new IntersectionObserver((es,o)=>{es.forEach(e=>{if(e.isIntersecting&&!running){
-  running=1;fast=false;o.disconnect();}});},{threshold:.35}).observe($("#e2"));
+  running=1;fast=false;o.disconnect();}});},{threshold:.1}).observe($("#e2"));
 mk("ec2",(ctx,W,H,dt)=>{
   const cx=W*.38,cy=H/2,R=Math.min(105,H*.38);
   if(running){t19+=dt*(fast?9:2.4);
