@@ -17,6 +17,7 @@ en/letter-N.html    English letters, numbered
 | N | Turkish        | English                    |
 | - | -------------- | -------------------------- |
 | 1 | Mucize Kalemdi | The Pencil Was the Miracle |
+| 2 |                | Welcome to Russia          |
 
 ## Serving
 
