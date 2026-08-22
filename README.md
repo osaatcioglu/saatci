@@ -18,7 +18,7 @@ en/letter-N.html    English letters, numbered
 | - | --------------------------------- | ----------------------------- |
 | 1 | Mucize Kalemdi                    | The Pencil Was the Miracle    |
 | 2 | Rus İmparatorluğu'na Hoş Geldiniz | Welcome to the Russian Empire |
-| 3 |                                   | Prison Break                  |
+| 3 | Firar                             | Prison Break                  |
 
 ## Serving
 
